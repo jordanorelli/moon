@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"unicode"
 )
 
 type tokenType int
@@ -90,6 +91,9 @@ func lexRoot(l *lexer) (stateFn, error) {
 	r, err := l.next()
 	if err != nil {
 		return nil, err
+	}
+	if unicode.IsSpace(r) {
+		return lexRoot, nil
 	}
 	switch r {
 	case '"', '`':
