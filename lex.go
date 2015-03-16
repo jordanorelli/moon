@@ -13,6 +13,7 @@ type tokenType int
 const (
 	t_error  tokenType = iota // a stored lex error
 	t_string                  // a string literal
+	t_name                    // a name
 )
 
 type stateFn func(*lexer) (stateFn, error)
@@ -23,9 +24,10 @@ type token struct {
 }
 
 type lexer struct {
-	in  io.RuneReader
-	out chan token
-	buf []rune // running buffer for current lexeme
+	in     io.RuneReader
+	out    chan token
+	buf    []rune // running buffer for current lexeme
+	backup []rune
 }
 
 func (l *lexer) lex() {
@@ -46,6 +48,11 @@ func (l *lexer) lex() {
 }
 
 func (l *lexer) next() (rune, error) {
+	if len(l.backup) > 0 {
+		r := l.backup[len(l.backup)-1]
+		l.backup = l.backup[:len(l.backup)-1]
+		return r, nil
+	}
 	r, _, err := l.in.ReadRune()
 	return r, err
 }
@@ -55,6 +62,10 @@ func (l *lexer) keep(r rune) {
 		l.buf = make([]rune, 0, 18)
 	}
 	l.buf = append(l.buf, r)
+}
+
+func (l *lexer) unread(r rune) {
+	l.backup = append(l.backup, r)
 }
 
 func (l *lexer) emit(t tokenType) {
@@ -69,8 +80,9 @@ func lexString(in string) chan token {
 
 func lex(r io.RuneReader) chan token {
 	l := lexer{
-		in:  r,
-		out: make(chan token),
+		in:     r,
+		out:    make(chan token),
+		backup: make([]rune, 0, 4),
 	}
 	go l.lex()
 	return l.out
@@ -92,12 +104,14 @@ func lexRoot(l *lexer) (stateFn, error) {
 	if err != nil {
 		return nil, err
 	}
-	if unicode.IsSpace(r) {
-		return lexRoot, nil
-	}
-	switch r {
-	case '"', '`':
+	switch {
+	case r == '"', r == '`':
 		return lexStringLiteral(r), nil
+	case unicode.IsSpace(r):
+		return lexRoot, nil
+	case unicode.IsLower(r):
+		l.keep(r)
+		return lexName, nil
 	default:
 		return nil, fmt.Errorf("unexpected rune in lexRoot: %c", r)
 	}
@@ -125,4 +139,18 @@ func lexStringLiteral(delim rune) stateFn {
 			return lexStringLiteral(delim), nil
 		}
 	}
+}
+
+func lexName(l *lexer) (stateFn, error) {
+	r, err := l.next()
+	if err != nil {
+		return nil, err
+	}
+	if r == '_' || unicode.IsLower(r) {
+		l.keep(r)
+		return lexName, nil
+	}
+	l.emit(t_name)
+	l.unread(r)
+	return lexRoot, nil
 }

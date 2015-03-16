@@ -14,6 +14,9 @@ var primitivesTests = []struct {
 	{`"this one has \"quotes\" in it"`, token{t_string, `this one has "quotes" in it`}},
 	{"`this one is delimited by backticks`", token{t_string, "this one is delimited by backticks"}},
 	{`  "this one has white space on either end"  `, token{t_string, "this one has white space on either end"}},
+	{`name`, token{t_name, "name"}},
+	{`name_with_underscore`, token{t_name, "name_with_underscore"}},
+	{`  name_surrounded_by_whitespace  `, token{t_name, "name_surrounded_by_whitespace"}},
 }
 
 func TestLexPrimities(t *testing.T) {
