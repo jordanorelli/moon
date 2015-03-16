@@ -17,6 +17,11 @@ var primitivesTests = []struct {
 	{`name`, token{t_name, "name"}},
 	{`name_with_underscore`, token{t_name, "name_with_underscore"}},
 	{`  name_surrounded_by_whitespace  `, token{t_name, "name_surrounded_by_whitespace"}},
+	{`name1`, token{t_name, "name1"}},
+	{`camelName`, token{t_name, "camelName"}},
+	{`Type`, token{t_type, "Type"}},
+	{`CamelType`, token{t_type, "CamelType"}},
+	{`Type_1_2`, token{t_type, "Type_1_1"}},
 }
 
 func TestLexPrimities(t *testing.T) {

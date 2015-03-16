@@ -14,6 +14,7 @@ const (
 	t_error  tokenType = iota // a stored lex error
 	t_string                  // a string literal
 	t_name                    // a name
+	t_type                    // a type
 )
 
 type stateFn func(*lexer) (stateFn, error)
@@ -112,6 +113,9 @@ func lexRoot(l *lexer) (stateFn, error) {
 	case unicode.IsLower(r):
 		l.keep(r)
 		return lexName, nil
+	case unicode.IsUpper(r):
+		l.keep(r)
+		return lexType, nil
 	default:
 		return nil, fmt.Errorf("unexpected rune in lexRoot: %c", r)
 	}
@@ -146,11 +150,29 @@ func lexName(l *lexer) (stateFn, error) {
 	if err != nil {
 		return nil, err
 	}
-	if r == '_' || unicode.IsLower(r) {
+	switch {
+	case unicode.IsLetter(r), unicode.IsDigit(r), r == '_':
 		l.keep(r)
 		return lexName, nil
+	default:
+		l.emit(t_name)
+		l.unread(r)
+		return lexRoot, nil
 	}
-	l.emit(t_name)
-	l.unread(r)
-	return lexRoot, nil
+}
+
+func lexType(l *lexer) (stateFn, error) {
+	r, err := l.next()
+	if err != nil {
+		return nil, err
+	}
+	switch {
+	case unicode.IsLetter(r), unicode.IsDigit(r), r == '_':
+		l.keep(r)
+		return lexType, nil
+	default:
+		l.emit(t_type)
+		l.unread(r)
+		return lexRoot, nil
+	}
 }
