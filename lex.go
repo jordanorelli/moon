@@ -15,6 +15,7 @@ const (
 	t_string                  // a string literal
 	t_name                    // a name
 	t_type                    // a type
+	t_equals                  // equals sign
 )
 
 type stateFn func(*lexer) (stateFn, error)
@@ -106,6 +107,10 @@ func lexRoot(l *lexer) (stateFn, error) {
 		return nil, err
 	}
 	switch {
+	case r == '=':
+		l.keep(r)
+		l.emit(t_equals)
+		return lexRoot, nil
 	case r == '"', r == '`':
 		return lexStringLiteral(r), nil
 	case unicode.IsSpace(r):
@@ -147,7 +152,12 @@ func lexStringLiteral(delim rune) stateFn {
 
 func lexName(l *lexer) (stateFn, error) {
 	r, err := l.next()
-	if err != nil {
+	switch err {
+	case io.EOF:
+		l.emit(t_name)
+		return nil, io.EOF
+	case nil:
+	default:
 		return nil, err
 	}
 	switch {
@@ -163,7 +173,12 @@ func lexName(l *lexer) (stateFn, error) {
 
 func lexType(l *lexer) (stateFn, error) {
 	r, err := l.next()
-	if err != nil {
+	switch err {
+	case io.EOF:
+		l.emit(t_type)
+		return nil, io.EOF
+	case nil:
+	default:
 		return nil, err
 	}
 	switch {
