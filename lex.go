@@ -28,11 +28,12 @@ func (t tokenType) String() string {
 }
 
 const (
-	t_error  tokenType = iota // a stored lex error
-	t_string                  // a string literal
-	t_name                    // a name
-	t_type                    // a type
-	t_equals                  // equals sign
+	t_error   tokenType = iota // a stored lex error
+	t_string                   // a string literal
+	t_name                     // a name
+	t_type                     // a type
+	t_equals                   // equals sign
+	t_comment                  // a comment
 )
 
 type stateFn func(*lexer) (stateFn, error)

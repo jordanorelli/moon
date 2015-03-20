@@ -4,6 +4,44 @@ import (
 	"testing"
 )
 
+var parseTests = []parseTest{
+	{
+		in:   ``,
+		desc: "an empty string is a valid config",
+		configTests: []configTest{
+			{
+				desc: "undefined name field should not exist",
+				pass: inv(hasKey("name")),
+			},
+		},
+	},
+	{
+		in:        `name `,
+		desc:      "eof after name",
+		errorType: e_unexpected_eof,
+	},
+	{
+		in:        `firstname lastname`,
+		desc:      "two names in a row",
+		errorType: e_unexpected_token,
+	},
+	{
+		in:        `name = `,
+		desc:      "eof after equals",
+		errorType: e_unexpected_eof,
+	},
+	{
+		in:   `name = "jordan"`,
+		desc: "assign a value",
+		configTests: []configTest{
+			{
+				desc: "should have name",
+				pass: hasValue("name", "jordan"),
+			},
+		},
+	},
+}
+
 // a boolean statement about a config struct
 type configPredicate func(*Config) bool
 
@@ -58,39 +96,6 @@ type configTest struct {
 	pass configPredicate
 }
 
-var parseTests = []parseTest{
-	{
-		in:   ``,
-		desc: "an empty string is a valid config",
-		configTests: []configTest{
-			{
-				desc: "undefined name field should not exist",
-				pass: inv(hasKey("name")),
-			},
-		},
-	},
-	{
-		in:        `name `,
-		desc:      "a name alone is not a valid config",
-		errorType: e_unexpected_eof,
-	},
-	{
-		in:        `name = `,
-		desc:      "dangling assignment",
-		errorType: e_unexpected_eof,
-	},
-	{
-		in:   `name = "jordan"`,
-		desc: "assign a value",
-		configTests: []configTest{
-			{
-				desc: "should have name",
-				pass: hasKey("name"),
-			},
-		},
-	},
-}
-
 // inverts a given config predicate
 func inv(fn configPredicate) configPredicate {
 	return func(c *Config) bool {
@@ -101,6 +106,21 @@ func inv(fn configPredicate) configPredicate {
 func hasKey(s string) configPredicate {
 	return func(c *Config) bool {
 		return c.hasKey(s)
+	}
+}
+
+func hasValue(key string, expected interface{}) configPredicate {
+	switch t := expected.(type) {
+	case string:
+		return hasStringValue(key, t)
+	default:
+		panic("no we can't do that yet")
+	}
+}
+
+func hasStringValue(key string, expected string) configPredicate {
+	return func(c *Config) bool {
+		return c.GetString(key) == expected
 	}
 }
 

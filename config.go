@@ -30,3 +30,22 @@ func (c *Config) set(key string, value interface{}) {
 	}
 	c.items[key] = value
 }
+
+func (c *Config) Get(key string) interface{} {
+	if c.items == nil {
+		return nil
+	}
+	return c.items[key]
+}
+
+func (c *Config) GetString(key string) string {
+	v := c.Get(key)
+	if v == nil {
+		return ""
+	}
+	s, ok := v.(string)
+	if ok {
+		return s
+	}
+	return ""
+}
