@@ -24,6 +24,12 @@ var primitivesTests = []struct {
 	{`Type_1_2`, []token{{t_type, "Type_1_2"}}},
 	{`=`, []token{{t_equals, "="}}},
 	{` = `, []token{{t_equals, "="}}},
+	{`"x" "y"`, []token{{t_string, "x"}, {t_string, "y"}}},
+	{`x = "sam"`, []token{
+		{t_name, "x"},
+		{t_equals, "="},
+		{t_string, "sam"},
+	}},
 }
 
 func TestLexPrimities(t *testing.T) {

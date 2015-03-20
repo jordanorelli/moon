@@ -10,6 +10,23 @@ import (
 
 type tokenType int
 
+func (t tokenType) String() string {
+	switch t {
+	case t_error:
+		return "t_error"
+	case t_string:
+		return "t_string"
+	case t_name:
+		return "t_name"
+	case t_type:
+		return "t_type"
+	case t_equals:
+		return "t_equals"
+	default:
+		panic(fmt.Sprintf("unknown token type: %v", t))
+	}
+}
+
 const (
 	t_error  tokenType = iota // a stored lex error
 	t_string                  // a string literal
