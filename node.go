@@ -157,3 +157,5 @@ type listElem struct {
 	prev  *listElem
 	next  *listElem
 }
+
+type object map[string]interface{}

@@ -33,22 +33,31 @@ func (t tokenType) String() string {
 		return "t_list_end"
 	case t_list_separator:
 		return "t_list_separator"
+	case t_object_start:
+		return "t_object_start"
+	case t_object_separator:
+		return "t_object_separator"
+	case t_object_end:
+		return "t_object_end"
 	default:
 		panic(fmt.Sprintf("unknown token type: %v", t))
 	}
 }
 
 const (
-	t_error          tokenType = iota // a stored lex error
-	t_eof                             // end of file token
-	t_string                          // a string literal
-	t_name                            // a name
-	t_type                            // a type
-	t_equals                          // equals sign
-	t_comment                         // a comment
-	t_list_start                      // [
-	t_list_end                        // ]
-	t_list_separator                  // ,
+	t_error            tokenType = iota // a stored lex error
+	t_eof                               // end of file token
+	t_string                            // a string literal
+	t_name                              // a name
+	t_type                              // a type
+	t_equals                            // equals sign
+	t_comment                           // a comment
+	t_list_start                        // [
+	t_list_end                          // ]
+	t_list_separator                    // ,
+	t_object_start                      // {
+	t_object_end                        // }
+	t_object_separator                  // :
 )
 
 type stateFn func(*lexer) (stateFn, error)
@@ -160,6 +169,18 @@ func lexRoot(l *lexer) (stateFn, error) {
 	case r == ',':
 		l.keep(r)
 		l.emit(t_list_separator)
+		return lexRoot, nil
+	case r == '{':
+		l.keep(r)
+		l.emit(t_object_start)
+		return lexRoot, nil
+	case r == '}':
+		l.keep(r)
+		l.emit(t_object_end)
+		return lexRoot, nil
+	case r == ':':
+		l.keep(r)
+		l.emit(t_object_separator)
 		return lexRoot, nil
 	case unicode.IsSpace(r):
 		return lexRoot, nil

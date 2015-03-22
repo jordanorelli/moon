@@ -55,6 +55,13 @@ func (p *parser) unread(t token) {
 	p.backup = append(p.backup, t)
 }
 
+func (p *parser) ensureNext(tt tokenType, context string) error {
+	if p.peek().t != tt {
+		return fmt.Errorf("unexpected %v in %s: expected %v", p.peek().t, context, tt)
+	}
+	return nil
+}
+
 // parse the next value.  This is to be executed in a context where we know we
 // want something that is a value to come next, such as after an equals sign.
 func (p *parser) parseValue() (interface{}, error) {
@@ -69,6 +76,8 @@ func (p *parser) parseValue() (interface{}, error) {
 			return t.s, nil
 		case t_list_start:
 			return p.parseList(new(list))
+		case t_object_start:
+			return p.parseObject(make(object))
 		default:
 			return nil, fmt.Errorf("parse error: unexpected %v token while looking for value", t.t)
 		}
@@ -94,5 +103,35 @@ func (p *parser) parseList(l *list) (*list, error) {
 		return l, nil
 	default:
 		return nil, fmt.Errorf("parse error: unexpected %v token while scanning for list", t.t)
+	}
+}
+
+func (p *parser) parseObject(obj object) (object, error) {
+	if p.peek().t == t_object_end {
+		p.next()
+		return obj, nil
+	}
+	if err := p.ensureNext(t_name, "looking for object field name in parseObject"); err != nil {
+		return nil, err
+	}
+	field_name := p.next().s
+	if err := p.ensureNext(t_object_separator, "looking for object separator in parseObject"); err != nil {
+		return nil, err
+	}
+	p.next()
+
+	if v, err := p.parseValue(); err != nil {
+		return nil, err
+	} else {
+		obj[field_name] = v
+	}
+
+	switch t := p.next(); t.t {
+	case t_list_separator:
+		return p.parseObject(obj)
+	case t_object_end:
+		return obj, nil
+	default:
+		return nil, fmt.Errorf("parse error: unexpected %v token while scanning for object", t.t)
 	}
 }

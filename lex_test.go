@@ -37,6 +37,18 @@ var primitivesTests = []struct {
     `, []token{{t_comment, " comment line one"}, {t_comment, " comment line two"}}},
 	{`[]`, []token{{t_list_start, "["}, {t_list_end, "]"}}},
 	{`["item"]`, []token{{t_list_start, "["}, {t_string, "item"}, {t_list_end, "]"}}},
+	{`{}`, []token{{t_object_start, "{"}, {t_object_end, "}"}}},
+	{`{first_name: "jordan", last_name: "orelli"}`, []token{
+		{t_object_start, "{"},
+		{t_name, "first_name"},
+		{t_object_separator, ":"},
+		{t_string, "jordan"},
+		{t_list_separator, ","},
+		{t_name, "last_name"},
+		{t_object_separator, ":"},
+		{t_string, "orelli"},
+		{t_object_end, "}"},
+	}},
 }
 
 func TestLexPrimities(t *testing.T) {

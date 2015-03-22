@@ -59,6 +59,36 @@ var parseTests = []parseTest{
         `,
 		root: &rootNode{},
 	},
+	{
+		source: `
+        nested = [["one", "two"], ["three", "four"]]
+        `,
+		root: &rootNode{},
+	},
+	{
+		source: `
+        nested = [
+            ["one", "two"],
+            ["three", "four"],
+        ]
+        `,
+		root: &rootNode{},
+	},
+	{
+		source: `
+	    admin = {first_name: "jordan", last_name: "orelli"}
+	    `,
+		root: &rootNode{},
+	},
+	{
+		source: `
+        http = {
+            port: "9000",
+            routes: "/path/to/some/file",
+        }
+        `,
+		root: &rootNode{},
+	},
 }
 
 type parseTest struct {
