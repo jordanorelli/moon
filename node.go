@@ -36,7 +36,7 @@ func (n *rootNode) parse(p *parser) error {
 		t := p.next()
 		switch t.t {
 		case t_error:
-			return fmt.Errorf("parse error: saw lex error while parsing root node: %v", t.s)
+			return fmt.Errorf("parse error: saw lex error while parsing root node: %v", t)
 		case t_eof:
 			return nil
 		case t_comment:

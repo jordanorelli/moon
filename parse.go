@@ -39,7 +39,11 @@ func (p *parser) next() token {
 		p.backup = p.backup[:len(p.backup)-1]
 		return t
 	}
-	return <-p.input
+	t, ok := <-p.input
+	if !ok {
+		return token{t_eof, "eof"}
+	}
+	return t
 }
 
 func (p *parser) peek() token {
