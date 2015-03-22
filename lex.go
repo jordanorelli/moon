@@ -41,8 +41,8 @@ func (t tokenType) String() string {
 		return "t_object_separator"
 	case t_object_end:
 		return "t_object_end"
-	case t_int:
-		return "t_int"
+	case t_number:
+		return "t_number"
 	default:
 		panic(fmt.Sprintf("unknown token type: %v", t))
 	}
@@ -62,7 +62,7 @@ const (
 	t_object_start                      // {
 	t_object_end                        // }
 	t_object_separator                  // :
-	t_int                               // an integer
+	t_number                            // a number
 )
 
 type stateFn func(*lexer) stateFn
@@ -70,6 +70,10 @@ type stateFn func(*lexer) stateFn
 type token struct {
 	t tokenType
 	s string
+}
+
+func (t token) String() string {
+	return fmt.Sprintf("{%s %s}", t.t, t.s)
 }
 
 type lexer struct {
@@ -123,6 +127,25 @@ func (l *lexer) unread(r rune) {
 func (l *lexer) emit(t tokenType) {
 	l.out <- token{t, string(l.buf)}
 	l.buf = l.buf[0:0]
+}
+
+func (l *lexer) accept(chars string) bool {
+	r := l.next()
+	if strings.IndexRune(chars, r) >= 0 {
+		l.keep(r)
+		return true
+	} else {
+		l.unread(r)
+		return false
+	}
+}
+
+func (l *lexer) acceptRun(chars string) bool {
+	none := true
+	for l.accept(chars) {
+		none = false
+	}
+	return !none
 }
 
 func lexString(in string) chan token {
@@ -195,9 +218,9 @@ func lexRoot(l *lexer) stateFn {
 		l.keep(r)
 		l.emit(t_object_separator)
 		return lexRoot
-	// case strings.IndexRune("-0123456789", r) >= 0:
-	// 	l.unread(r)
-	// 	return lexNumber, nil
+	case strings.IndexRune(".+-0123456789", r) >= 0:
+		l.unread(r)
+		return lexNumber
 	case unicode.IsSpace(r):
 		return lexRoot
 	case unicode.IsLower(r):
@@ -280,76 +303,34 @@ func lexType(l *lexer) stateFn {
 	}
 }
 
-// func lexNumber(l *lexer) (stateFn, error) {
-// 	r, err := l.next()
-// 	if err != nil {
-// 		return nil, err
-// 	}
-//
-// 	switch {
-// 	case r == '-', r == '+':
-// 		l.keep(r)
-// 		return lexNumber, nil
-// 	case r == '0':
-// 		l.keep(r)
-// 		return lexHexOct, nil
-// 	case strings.IndexRune("123456789", r) >= 0:
-// 		l.keep(r)
-// 		return lexDecimal, nil
-// 	default:
-// 		return nil, fmt.Errorf("unexpected rune in lexNumber: %c", r)
-// 	}
-// }
-//
-// func lexHexOct(l *lexer) (stateFn, error) {
-// 	r, err := l.next()
-// 	if err != nil {
-// 		return nil, err
-// 	}
-//
-// 	switch {
-// 	case r == 'x', r == 'X':
-// 		l.keep(r)
-// 		return lexHex, nil
-//     case r == 'e', r == 'E':
-//         l.keep(r)
-//         return lexExponent, nil
-// 	case r == '8', r == '9':
-// 		return nil, fmt.Errorf("unexpected 8 or 9 in lexHexOct.  there's no 8 or 9 in octal!")
-// 	case strings.IndexRune("01234567", r) >= 0:
-// 		l.keep(r)
-// 		return lexOct, nil
-// 	default:
-//         // we get here for the literals -0, +0 and 0
-// 		l.unread(r)
-//         l.emit(t_int)
-//         return lexRoot, nil
-// 	}
-// }
-//
-// func lexHex(l *lexer) (stateFn, error) {
-// 	r, err := l.next()
-// 	if err != nil {
-// 		return nil, err
-// 	}
-//
-//     switch {
-//
-//     }
-// }
-//
-// func lexDecimal(l *lexer) (stateFn, error) {
-// 	r, err := l.next()
-// 	if err != nil {
-// 		return nil, err
-// 	}
-//
-// 	switch {
-//     case strings.IndexRune("0123456789", r) >= 0:
-//         l.keep(r)
-//         return lexDecimal, nil
-//     case r == '.':
-//         l.keep(r)
-//         return lexFloat, nil
-// 	}
-// }
+func lexNumber(l *lexer) stateFn {
+	l.accept("+-")
+	digits := "0123456789"
+	if l.accept("0") {
+		if l.accept("xX") {
+			digits = "0123456789abcdefABCDEF"
+		} else {
+			digits = "01234567"
+		}
+	}
+	l.acceptRun(digits)
+	if l.accept(".") {
+		l.acceptRun(digits)
+	}
+	if l.accept("eE") {
+		l.accept("+-")
+		l.acceptRun("0123456789")
+	}
+	l.accept("i")
+	r := l.next()
+	if isAlphaNumeric(r) {
+		return lexErrorf("unexpected alphanum in lexNumber: %c", r)
+	}
+	l.unread(r)
+	l.emit(t_number)
+	return lexRoot
+}
+
+func isAlphaNumeric(r rune) bool {
+	return r == '_' || unicode.IsLetter(r) || unicode.IsDigit(r)
+}
