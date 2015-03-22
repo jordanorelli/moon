@@ -67,7 +67,7 @@ func (n *rootNode) String() string {
 	for _, child := range n.children {
 		fmt.Fprintf(&buf, "%s, ", child)
 	}
-	if len(n.children) > 0 {
+	if buf.Len() > 1 {
 		buf.Truncate(buf.Len() - 2)
 	}
 	buf.WriteString("}")
@@ -109,20 +109,51 @@ func (n *assignmentNode) parse(p *parser) error {
 		return fmt.Errorf("parse error: unexpected %v token after name, expected =", t.t)
 	}
 
-	t = p.next()
-	switch t.t {
-	case t_error:
-		return fmt.Errorf("parse error: saw lex error while parsing assignment node: %v", t.s)
-	case t_eof:
-		return fmt.Errorf("parse error: unexpected eof in assignment node")
-	case t_string:
-		n.value = t.s
-		return nil
-	default:
-		return fmt.Errorf("parse error: unexpected %v token after =, expected some kind of value", t.t)
+	v, err := p.parseValue()
+	if err != nil {
+		return err
 	}
+	n.value = v
+	return nil
 }
 
 func (n *assignmentNode) String() string {
 	return fmt.Sprintf("{assign: name=%s, val=%s}", n.name, n.value)
+}
+
+type list struct {
+	head *listElem
+	tail *listElem
+}
+
+func (l list) String() string {
+	var buf bytes.Buffer
+	buf.WriteString("[")
+	for e := l.head; e != nil; e = e.next {
+		fmt.Fprintf(&buf, "%v, ", e.value)
+	}
+	if buf.Len() > 1 {
+		buf.Truncate(buf.Len() - 2)
+	}
+	buf.WriteString("]")
+	return buf.String()
+}
+
+func (l *list) append(v interface{}) {
+	e := listElem{value: v}
+	if l.head == nil {
+		l.head = &e
+	}
+
+	if l.tail != nil {
+		l.tail.next = &e
+		e.prev = l.tail
+	}
+	l.tail = &e
+}
+
+type listElem struct {
+	value interface{}
+	prev  *listElem
+	next  *listElem
 }

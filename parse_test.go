@@ -53,6 +53,12 @@ var parseTests = []parseTest{
         `,
 		root: &rootNode{},
 	},
+	{
+		source: `
+        heroes = ["lina", "cm"]
+        `,
+		root: &rootNode{},
+	},
 }
 
 type parseTest struct {

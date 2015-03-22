@@ -35,6 +35,8 @@ var primitivesTests = []struct {
     # comment line one
     # comment line two
     `, []token{{t_comment, " comment line one"}, {t_comment, " comment line two"}}},
+	{`[]`, []token{{t_list_start, "["}, {t_list_end, "]"}}},
+	{`["item"]`, []token{{t_list_start, "["}, {t_string, "item"}, {t_list_end, "]"}}},
 }
 
 func TestLexPrimities(t *testing.T) {
