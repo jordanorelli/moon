@@ -68,30 +68,31 @@ func (p *parser) parseValue() (interface{}, error) {
 		case t_string:
 			return t.s, nil
 		case t_list_start:
-			l := new(list)
-
-		SIN:
-			if p.peek().t == t_list_end {
-				p.next()
-				return l, nil
-			}
-
-			if v, err := p.parseValue(); err != nil {
-				return nil, err
-			} else {
-				l.append(v)
-			}
-
-			switch t := p.next(); t.t {
-			case t_list_separator:
-				goto SIN
-			case t_list_end:
-				return l, nil
-			default:
-				return nil, fmt.Errorf("parse error: unexpected %v token while scanning for list", t.t)
-			}
+			return p.parseList(new(list))
 		default:
 			return nil, fmt.Errorf("parse error: unexpected %v token while looking for value", t.t)
 		}
+	}
+}
+
+func (p *parser) parseList(l *list) (*list, error) {
+	if p.peek().t == t_list_end {
+		p.next()
+		return l, nil
+	}
+
+	if v, err := p.parseValue(); err != nil {
+		return nil, err
+	} else {
+		l.append(v)
+	}
+
+	switch t := p.next(); t.t {
+	case t_list_separator:
+		return p.parseList(l)
+	case t_list_end:
+		return l, nil
+	default:
+		return nil, fmt.Errorf("parse error: unexpected %v token while scanning for list", t.t)
 	}
 }
