@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
 	"io"
@@ -14,6 +15,8 @@ func (t tokenType) String() string {
 	switch t {
 	case t_error:
 		return "t_error"
+	case t_eof:
+		return "t_eof"
 	case t_string:
 		return "t_string"
 	case t_name:
@@ -22,6 +25,8 @@ func (t tokenType) String() string {
 		return "t_type"
 	case t_equals:
 		return "t_equals"
+	case t_comment:
+		return "t_comment"
 	default:
 		panic(fmt.Sprintf("unknown token type: %v", t))
 	}
@@ -29,6 +34,7 @@ func (t tokenType) String() string {
 
 const (
 	t_error   tokenType = iota // a stored lex error
+	t_eof                      // end of file token
 	t_string                   // a string literal
 	t_name                     // a name
 	t_type                     // a type
@@ -59,6 +65,7 @@ func (l *lexer) lex() {
 		switch err {
 		case nil:
 		case io.EOF:
+			l.out <- token{t_eof, ""}
 			return
 		default:
 			l.out <- token{t_error, err.Error()}
@@ -98,9 +105,9 @@ func lexString(in string) chan token {
 	return lex(r)
 }
 
-func lex(r io.RuneReader) chan token {
+func lex(r io.Reader) chan token {
 	l := lexer{
-		in:     r,
+		in:     bufio.NewReader(r),
 		out:    make(chan token),
 		backup: make([]rune, 0, 4),
 	}
@@ -131,6 +138,8 @@ func lexRoot(l *lexer) (stateFn, error) {
 		return lexRoot, nil
 	case r == '"', r == '`':
 		return lexStringLiteral(r), nil
+	case r == '#':
+		return lexComment, nil
 	case unicode.IsSpace(r):
 		return lexRoot, nil
 	case unicode.IsLower(r):
@@ -141,6 +150,26 @@ func lexRoot(l *lexer) (stateFn, error) {
 		return lexType, nil
 	default:
 		return nil, fmt.Errorf("unexpected rune in lexRoot: %c", r)
+	}
+}
+
+func lexComment(l *lexer) (stateFn, error) {
+	r, err := l.next()
+	switch err {
+	case io.EOF:
+		l.emit(t_comment)
+		return nil, io.EOF
+	case nil:
+	default:
+		return nil, err
+	}
+	switch {
+	case r == '\n':
+		l.emit(t_comment)
+		return lexRoot, nil
+	default:
+		l.keep(r)
+		return lexComment, nil
 	}
 }
 

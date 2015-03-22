@@ -1,127 +1,76 @@
 package main
 
 import (
+	"strings"
 	"testing"
 )
 
 var parseTests = []parseTest{
 	{
-		in:   ``,
-		desc: "an empty string is a valid config",
-		configTests: []configTest{
-			{
-				desc: "undefined name field should not exist",
-				pass: inv(hasKey("name")),
+		source: ``,
+		root: &rootNode{
+			children: []node{},
+		},
+	},
+	{
+		source: `# just a comment`,
+		root: &rootNode{
+			children: []node{
+				commentNode(" just a comment"),
 			},
 		},
 	},
 	{
-		in:        `name `,
-		desc:      "eof after name",
-		errorType: e_unexpected_eof,
-	},
-	{
-		in:        `firstname lastname`,
-		desc:      "two names in a row",
-		errorType: e_unexpected_token,
-	},
-	{
-		in:        `name = `,
-		desc:      "eof after equals",
-		errorType: e_unexpected_eof,
-	},
-	{
-		in:   `name = "jordan"`,
-		desc: "assign a value",
-		configTests: []configTest{
-			{
-				desc: "should have name",
-				pass: hasValue("name", "jordan"),
+		source: `name = "jordan"`,
+		root: &rootNode{
+			children: []node{
+				&assignmentNode{
+					name:  "name",
+					value: "jordan",
+				},
 			},
 		},
+	},
+	{
+		source: `
+        first_name = "jordan"
+        last_name = "orelli"
+        `,
+		root: &rootNode{},
+	},
+	{
+		source: `
+        # personal info
+        first_name = "jordan"
+        last_name = "orelli"
+        `,
+		root: &rootNode{},
+	},
+	{
+		source: `
+        first_name = "jordan" # yep, that's my name
+        last_name = "orelli"  # comments should be able to follow other shit
+        `,
+		root: &rootNode{},
 	},
 }
 
-// a boolean statement about a config struct
-type configPredicate func(*Config) bool
-
-// a suite of tests for parsing potm input
 type parseTest struct {
-	in          string
-	desc        string
-	configTests []configTest
-	errorType   parseErrorType
+	source string
+	root   *rootNode
 }
 
 func (p *parseTest) run(t *testing.T) {
-	c, err := parseString(p.in)
+	r := strings.NewReader(p.source)
+	n, err := parse(r)
 	if err != nil {
-		t.Logf("test %s has error %v", p.desc, err)
-		e, ok := err.(parseError)
-		if !ok {
-			t.Errorf("unexpected error: %s", e)
-			return
-		}
-		if p.errorType == e.t {
-			t.Logf("OK: got expected error type %v for %s", e.t, p.desc)
-		} else {
-			t.Errorf("unexpected parse error: %s", e)
-			return
-		}
+		t.Errorf("parse error: %v", err)
+		return
 	}
-	t.Logf("parsed config for %s", p.desc)
-	t.Log(c)
-	p.runConfigTests(t, c)
-}
-
-func (p *parseTest) runConfigTests(t *testing.T, c *Config) {
-	ok := true
-	for _, test := range p.configTests {
-		if test.pass(c) {
-			t.Logf("OK: %s", test.desc)
-		} else {
-			t.Errorf("config predicate failed: %s", test.desc)
-			ok = false
-		}
+	if n.Type() != n_root {
+		t.Errorf("we expected a root node object, but instead we got: %s", n.Type())
 	}
-	if ok {
-		t.Logf("OK: %s", p.desc)
-	}
-}
-
-// an individual test for confirming that a parsed config struct meets some
-// predicate
-type configTest struct {
-	desc string
-	pass configPredicate
-}
-
-// inverts a given config predicate
-func inv(fn configPredicate) configPredicate {
-	return func(c *Config) bool {
-		return !fn(c)
-	}
-}
-
-func hasKey(s string) configPredicate {
-	return func(c *Config) bool {
-		return c.hasKey(s)
-	}
-}
-
-func hasValue(key string, expected interface{}) configPredicate {
-	switch t := expected.(type) {
-	case string:
-		return hasStringValue(key, t)
-	default:
-		panic("no we can't do that yet")
-	}
-}
-
-func hasStringValue(key string, expected string) configPredicate {
-	return func(c *Config) bool {
-		return c.GetString(key) == expected
-	}
+	t.Logf("output: %v", n)
 }
 
 func TestParse(t *testing.T) {

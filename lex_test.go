@@ -30,6 +30,11 @@ var primitivesTests = []struct {
 		{t_equals, "="},
 		{t_string, "sam"},
 	}},
+	{`# this is a comment`, []token{{t_comment, " this is a comment"}}},
+	{`
+    # comment line one
+    # comment line two
+    `, []token{{t_comment, " comment line one"}, {t_comment, " comment line two"}}},
 }
 
 func TestLexPrimities(t *testing.T) {
@@ -39,6 +44,7 @@ func TestLexPrimities(t *testing.T) {
 			t.Error(err)
 			continue
 		}
+		tokens = tokens[:len(tokens)-1]
 		if len(tokens) != len(test.out) {
 			t.Errorf("expected %d token, saw %d: %v", len(test.out), len(tokens), tokens)
 			continue
