@@ -1,6 +1,7 @@
 package main
 
 import (
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -16,7 +17,7 @@ var parseTests = []parseTest{
 		source: `# just a comment`,
 		root: &rootNode{
 			children: []node{
-				commentNode(" just a comment"),
+				&commentNode{" just a comment"},
 			},
 		},
 	},
@@ -24,76 +25,113 @@ var parseTests = []parseTest{
 		source: `name = "jordan"`,
 		root: &rootNode{
 			children: []node{
-				&assignmentNode{
-					name:  "name",
-					value: "jordan",
-				},
+				&assignmentNode{"name", "jordan"},
 			},
 		},
 	},
 	{
 		source: `
-        first_name = "jordan"
-        last_name = "orelli"
-        `,
-		root: &rootNode{},
+        hostname = "jordanorelli.com"
+	    port = 9000
+        freq = 1e9
+        duty = 0.2
+        neg = -2
+        neg2 = -2.3
+        imag = 1+2i
+	    `,
+		root: &rootNode{
+			children: []node{
+				&assignmentNode{"hostname", "jordanorelli.com"},
+				&assignmentNode{"port", 9000},
+				&assignmentNode{"freq", 1e9},
+				&assignmentNode{"duty", 0.2},
+				&assignmentNode{"neg", -2},
+				&assignmentNode{"neg2", -2.3},
+				&assignmentNode{"imag", 1 + 2i},
+			},
+		},
 	},
 	{
 		source: `
-        # personal info
-        first_name = "jordan"
-        last_name = "orelli"
-        `,
-		root: &rootNode{},
+	       first_name = "jordan" # yep, that's my name
+	       last_name = "orelli"  # comments should be able to follow other shit
+	       `,
+		root: &rootNode{
+			children: []node{
+				&assignmentNode{"first_name", "jordan"},
+				&commentNode{" yep, that's my name"},
+				&assignmentNode{"last_name", "orelli"},
+				&commentNode{" comments should be able to follow other shit"},
+			},
+		},
 	},
 	{
 		source: `
-        first_name = "jordan" # yep, that's my name
-        last_name = "orelli"  # comments should be able to follow other shit
-        `,
-		root: &rootNode{},
+	       heroes = ["lina", "cm"]
+	       `,
+		root: &rootNode{
+			children: []node{
+				&assignmentNode{"heroes", list{"lina", "cm"}},
+			},
+		},
 	},
 	{
 		source: `
-        heroes = ["lina", "cm"]
-        `,
-		root: &rootNode{},
+	       nested = [["one", "two"], ["three", "four"]]
+	       `,
+		root: &rootNode{
+			children: []node{
+				&assignmentNode{"nested", list{list{"one", "two"}, list{"three", "four"}}},
+			},
+		},
 	},
 	{
 		source: `
-        nested = [["one", "two"], ["three", "four"]]
-        `,
-		root: &rootNode{},
-	},
-	{
-		source: `
-        nested = [
-            ["one", "two"],
-            ["three", "four"],
-        ]
-        `,
-		root: &rootNode{},
+	       nested = [
+	           ["one", "two"],
+	           ["three", "four"],
+	       ]
+	       `,
+		root: &rootNode{
+			children: []node{
+				&assignmentNode{"nested", list{list{"one", "two"}, list{"three", "four"}}},
+			},
+		},
 	},
 	{
 		source: `
 	    admin = {first_name: "jordan", last_name: "orelli"}
 	    `,
-		root: &rootNode{},
+		root: &rootNode{
+			children: []node{
+				&assignmentNode{"admin", object{
+					"first_name": "jordan",
+					"last_name":  "orelli",
+				}},
+			},
+		},
 	},
 	{
 		source: `
-        http = {
-            port: "9000",
-            routes: "/path/to/some/file",
-        }
-        `,
-		root: &rootNode{},
+	       http = {
+	           port: 9000,
+	           routes: "/path/to/some/file",
+	       }
+	       `,
+		root: &rootNode{
+			children: []node{
+				&assignmentNode{"http", object{
+					"port":   9000,
+					"routes": "/path/to/some/file",
+				}},
+			},
+		},
 	},
 }
 
 type parseTest struct {
 	source string
-	root   *rootNode
+	root   node
 }
 
 func (p *parseTest) run(t *testing.T) {
@@ -103,10 +141,11 @@ func (p *parseTest) run(t *testing.T) {
 		t.Errorf("parse error: %v", err)
 		return
 	}
-	if n.Type() != n_root {
-		t.Errorf("we expected a root node object, but instead we got: %s", n.Type())
+	if !reflect.DeepEqual(p.root, n) {
+		t.Errorf("trees are not equal.  expected:\n%v\nsaw:\n%v", p.root, n)
+	} else {
+		t.Logf("OK trees are equal: %v = %v", p.root, n)
 	}
-	t.Logf("output: %v", n)
 }
 
 func TestParse(t *testing.T) {

@@ -41,8 +41,10 @@ func (t tokenType) String() string {
 		return "t_object_separator"
 	case t_object_end:
 		return "t_object_end"
-	case t_number:
-		return "t_number"
+	case t_real_number:
+		return "t_real_number"
+	case t_imaginary_number:
+		return "t_imaginary_number"
 	default:
 		panic(fmt.Sprintf("unknown token type: %v", t))
 	}
@@ -62,7 +64,8 @@ const (
 	t_object_start                      // {
 	t_object_end                        // }
 	t_object_separator                  // :
-	t_number                            // a number
+	t_real_number                       // a number
+	t_imaginary_number                  // an imaginary number
 )
 
 type stateFn func(*lexer) stateFn
@@ -321,13 +324,17 @@ func lexNumber(l *lexer) stateFn {
 		l.accept("+-")
 		l.acceptRun("0123456789")
 	}
-	l.accept("i")
+	imaginary := l.accept("i")
 	r := l.next()
 	if isAlphaNumeric(r) {
 		return lexErrorf("unexpected alphanum in lexNumber: %c", r)
 	}
 	l.unread(r)
-	l.emit(t_number)
+	if imaginary {
+		l.emit(t_imaginary_number)
+	} else {
+		l.emit(t_real_number)
+	}
 	return lexRoot
 }
 

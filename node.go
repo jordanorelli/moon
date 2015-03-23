@@ -40,8 +40,7 @@ func (n *rootNode) parse(p *parser) error {
 		case t_eof:
 			return nil
 		case t_comment:
-			shit := commentNode(t.s)
-			n.addChild(&shit)
+			n.addChild(&commentNode{t.s})
 		case t_name:
 			nn := &assignmentNode{name: t.s}
 			if err := nn.parse(p); err != nil {
@@ -74,18 +73,20 @@ func (n *rootNode) String() string {
 	return buf.String()
 }
 
-type commentNode string
+type commentNode struct {
+	body string
+}
 
-func (n commentNode) Type() nodeType {
+func (n *commentNode) Type() nodeType {
 	return n_comment
 }
 
-func (n commentNode) parse(p *parser) error {
+func (n *commentNode) parse(p *parser) error {
 	return nil
 }
 
-func (n commentNode) String() string {
-	return fmt.Sprintf("{comment: %s}", string(n))
+func (n *commentNode) String() string {
+	return fmt.Sprintf("{comment: %s}", n.body)
 }
 
 type assignmentNode struct {
@@ -93,7 +94,7 @@ type assignmentNode struct {
 	value interface{}
 }
 
-func (n assignmentNode) Type() nodeType {
+func (n *assignmentNode) Type() nodeType {
 	return n_assignment
 }
 
@@ -118,44 +119,8 @@ func (n *assignmentNode) parse(p *parser) error {
 }
 
 func (n *assignmentNode) String() string {
-	return fmt.Sprintf("{assign: name=%s, val=%s}", n.name, n.value)
+	return fmt.Sprintf("{assign: name=%s, val=%v}", n.name, n.value)
 }
 
-type list struct {
-	head *listElem
-	tail *listElem
-}
-
-func (l list) String() string {
-	var buf bytes.Buffer
-	buf.WriteString("[")
-	for e := l.head; e != nil; e = e.next {
-		fmt.Fprintf(&buf, "%v, ", e.value)
-	}
-	if buf.Len() > 1 {
-		buf.Truncate(buf.Len() - 2)
-	}
-	buf.WriteString("]")
-	return buf.String()
-}
-
-func (l *list) append(v interface{}) {
-	e := listElem{value: v}
-	if l.head == nil {
-		l.head = &e
-	}
-
-	if l.tail != nil {
-		l.tail.next = &e
-		e.prev = l.tail
-	}
-	l.tail = &e
-}
-
-type listElem struct {
-	value interface{}
-	prev  *listElem
-	next  *listElem
-}
-
+type list []interface{}
 type object map[string]interface{}

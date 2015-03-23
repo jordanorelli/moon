@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
+	"strconv"
 )
 
 const ()
@@ -78,8 +79,11 @@ func (p *parser) parseValue() (interface{}, error) {
 			return nil, fmt.Errorf("parse error: unexpected eof when looking for value")
 		case t_string:
 			return t.s, nil
+		case t_real_number, t_imaginary_number:
+			p.unread(t)
+			return p.number()
 		case t_list_start:
-			return p.parseList(new(list))
+			return p.parseList(make(list, 0, 4))
 		case t_object_start:
 			return p.parseObject(make(object))
 		default:
@@ -88,7 +92,7 @@ func (p *parser) parseValue() (interface{}, error) {
 	}
 }
 
-func (p *parser) parseList(l *list) (*list, error) {
+func (p *parser) parseList(l list) (list, error) {
 	if p.peek().t == t_list_end {
 		p.next()
 		return l, nil
@@ -97,7 +101,7 @@ func (p *parser) parseList(l *list) (*list, error) {
 	if v, err := p.parseValue(); err != nil {
 		return nil, err
 	} else {
-		l.append(v)
+		l = append(l, v)
 	}
 
 	switch t := p.next(); t.t {
@@ -138,4 +142,32 @@ func (p *parser) parseObject(obj object) (object, error) {
 	default:
 		return nil, fmt.Errorf("parse error: unexpected %v token while scanning for object", t.t)
 	}
+}
+
+func (p *parser) number() (interface{}, error) {
+	t := p.next()
+	if t.t != t_real_number {
+		return nil, fmt.Errorf("unexpected %s token while parsing number", t.t)
+	}
+
+	if p.peek().t == t_imaginary_number {
+		var c complex128
+		s := t.s + p.next().s
+		if _, err := fmt.Sscan(s, &c); err != nil {
+			return nil, fmt.Errorf("ungood imaginary number format %s: %s", s, err)
+		}
+		return c, nil
+	}
+
+	i, err := strconv.ParseInt(t.s, 0, 64)
+	if err == nil {
+		return int(i), nil
+	}
+
+	f, err := strconv.ParseFloat(t.s, 64)
+	if err == nil {
+		return f, nil
+	}
+
+	return nil, fmt.Errorf("this token broke the number parser: %s", t)
 }
