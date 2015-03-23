@@ -22,12 +22,12 @@ var primitivesTests = []struct {
 	{`Type`, []token{{t_type, "Type"}}},
 	{`CamelType`, []token{{t_type, "CamelType"}}},
 	{`Type_1_2`, []token{{t_type, "Type_1_2"}}},
-	{`=`, []token{{t_equals, "="}}},
-	{` = `, []token{{t_equals, "="}}},
+	{`:`, []token{{t_object_separator, ":"}}},
+	{` : `, []token{{t_object_separator, ":"}}},
 	{`"x" "y"`, []token{{t_string, "x"}, {t_string, "y"}}},
-	{`x = "sam"`, []token{
+	{`x: "sam"`, []token{
 		{t_name, "x"},
-		{t_equals, "="},
+		{t_object_separator, ":"},
 		{t_string, "sam"},
 	}},
 	{`# this is a comment`, []token{{t_comment, " this is a comment"}}},

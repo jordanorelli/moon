@@ -25,8 +25,6 @@ func (t tokenType) String() string {
 		return "t_name"
 	case t_type:
 		return "t_type"
-	case t_equals:
-		return "t_equals"
 	case t_comment:
 		return "t_comment"
 	case t_list_start:
@@ -56,7 +54,6 @@ const (
 	t_string                            // a string literal
 	t_name                              // a name
 	t_type                              // a type
-	t_equals                            // equals sign
 	t_comment                           // a comment
 	t_list_start                        // [
 	t_list_end                          // ]
@@ -189,9 +186,9 @@ func lexRoot(l *lexer) stateFn {
 	switch {
 	case r == eof:
 		return nil
-	case r == '=':
+	case r == ':':
 		l.keep(r)
-		l.emit(t_equals)
+		l.emit(t_object_separator)
 		return lexRoot
 	case r == '"', r == '`':
 		return lexStringLiteral(r)

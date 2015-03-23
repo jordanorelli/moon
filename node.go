@@ -105,7 +105,7 @@ func (n *assignmentNode) parse(p *parser) error {
 		return fmt.Errorf("parse error: saw lex error while parsing assignment node: %v", t.s)
 	case t_eof:
 		return fmt.Errorf("parse error: unexpected eof in assignment node")
-	case t_equals:
+	case t_object_separator:
 	default:
 		return fmt.Errorf("parse error: unexpected %v token after name, expected =", t.t)
 	}

@@ -22,7 +22,7 @@ var parseTests = []parseTest{
 		},
 	},
 	{
-		source: `name = "jordan"`,
+		source: `name: "jordan"`,
 		root: &rootNode{
 			children: []node{
 				&assignmentNode{"name", "jordan"},
@@ -31,13 +31,13 @@ var parseTests = []parseTest{
 	},
 	{
 		source: `
-        hostname = "jordanorelli.com"
-	    port = 9000
-        freq = 1e9
-        duty = 0.2
-        neg = -2
-        neg2 = -2.3
-        imag = 1+2i
+            hostname: "jordanorelli.com"
+            port: 9000
+            freq: 1e9
+            duty: 0.2
+            neg: -2
+            neg2: -2.3
+            imag: 1+2i
 	    `,
 		root: &rootNode{
 			children: []node{
@@ -53,9 +53,9 @@ var parseTests = []parseTest{
 	},
 	{
 		source: `
-	       first_name = "jordan" # yep, that's my name
-	       last_name = "orelli"  # comments should be able to follow other shit
-	       `,
+            first_name: "jordan" # yep, that's my name
+            last_name: "orelli"  # comments should be able to follow other shit
+        `,
 		root: &rootNode{
 			children: []node{
 				&assignmentNode{"first_name", "jordan"},
@@ -67,8 +67,8 @@ var parseTests = []parseTest{
 	},
 	{
 		source: `
-	       heroes = ["lina", "cm"]
-	       `,
+            heroes: ["lina", "cm"]
+        `,
 		root: &rootNode{
 			children: []node{
 				&assignmentNode{"heroes", list{"lina", "cm"}},
@@ -77,8 +77,8 @@ var parseTests = []parseTest{
 	},
 	{
 		source: `
-	       nested = [["one", "two"], ["three", "four"]]
-	       `,
+            nested: [["one", "two"], ["three", "four"]]
+        `,
 		root: &rootNode{
 			children: []node{
 				&assignmentNode{"nested", list{list{"one", "two"}, list{"three", "four"}}},
@@ -87,11 +87,11 @@ var parseTests = []parseTest{
 	},
 	{
 		source: `
-	       nested = [
+            nested: [
 	           ["one", "two"],
 	           ["three", "four"],
-	       ]
-	       `,
+	        ]
+        `,
 		root: &rootNode{
 			children: []node{
 				&assignmentNode{"nested", list{list{"one", "two"}, list{"three", "four"}}},
@@ -100,7 +100,7 @@ var parseTests = []parseTest{
 	},
 	{
 		source: `
-	    admin = {first_name: "jordan", last_name: "orelli"}
+            admin: {first_name: "jordan", last_name: "orelli"}
 	    `,
 		root: &rootNode{
 			children: []node{
@@ -113,11 +113,11 @@ var parseTests = []parseTest{
 	},
 	{
 		source: `
-	       http = {
+            http: {
 	           port: 9000,
 	           routes: "/path/to/some/file",
-	       }
-	       `,
+            }
+        `,
 		root: &rootNode{
 			children: []node{
 				&assignmentNode{"http", object{
