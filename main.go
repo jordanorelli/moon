@@ -46,7 +46,7 @@ func parsse() {
 
 	n, err := parse(r)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: %s", err)
+		fmt.Fprintf(os.Stderr, "error: %s\n", err)
 		os.Exit(1)
 	}
 	if err := n.pretty(os.Stdout, ""); err != nil {

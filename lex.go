@@ -31,8 +31,6 @@ func (t tokenType) String() string {
 		return "t_list_start"
 	case t_list_end:
 		return "t_list_end"
-	case t_list_separator:
-		return "t_list_separator"
 	case t_object_start:
 		return "t_object_start"
 	case t_object_separator:
@@ -57,7 +55,6 @@ const (
 	t_comment                           // a comment
 	t_list_start                        // [
 	t_list_end                          // ]
-	t_list_separator                    // ,
 	t_object_start                      // {
 	t_object_end                        // }
 	t_object_separator                  // :
@@ -201,10 +198,6 @@ func lexRoot(l *lexer) stateFn {
 	case r == ']':
 		l.keep(r)
 		l.emit(t_list_end)
-		return lexRoot
-	case r == ',':
-		l.keep(r)
-		l.emit(t_list_separator)
 		return lexRoot
 	case r == '{':
 		l.keep(r)

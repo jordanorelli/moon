@@ -104,13 +104,12 @@ func (p *parser) parseList(l list) (list, error) {
 		l = append(l, v)
 	}
 
-	switch t := p.next(); t.t {
-	case t_list_separator:
-		return p.parseList(l)
+	switch t := p.peek(); t.t {
 	case t_list_end:
+		p.next()
 		return l, nil
 	default:
-		return nil, fmt.Errorf("parse error: unexpected %v token while scanning for list", t.t)
+		return p.parseList(l)
 	}
 }
 
@@ -134,13 +133,12 @@ func (p *parser) parseObject(obj object) (object, error) {
 		obj[field_name] = v
 	}
 
-	switch t := p.next(); t.t {
-	case t_list_separator:
-		return p.parseObject(obj)
+	switch t := p.peek(); t.t {
 	case t_object_end:
+		p.next()
 		return obj, nil
 	default:
-		return nil, fmt.Errorf("parse error: unexpected %v token while scanning for object", t.t)
+		return p.parseObject(obj)
 	}
 }
 
