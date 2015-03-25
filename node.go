@@ -1,8 +1,11 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
+	"io"
+	"strings"
 )
 
 type nodeType int
@@ -14,9 +17,12 @@ const (
 	n_assignment
 )
 
+var indent = "  "
+
 type node interface {
 	Type() nodeType
 	parse(*parser) error
+	pretty(io.Writer, string) error
 }
 
 type rootNode struct {
@@ -73,6 +79,17 @@ func (n *rootNode) String() string {
 	return buf.String()
 }
 
+func (n *rootNode) pretty(w io.Writer, prefix string) error {
+	fmt.Fprintf(w, "%sroot{\n", prefix)
+	for _, child := range n.children {
+		if err := child.pretty(w, prefix+indent); err != nil {
+			return err
+		}
+	}
+	fmt.Fprintf(w, "%s}\n", prefix)
+	return nil
+}
+
 type commentNode struct {
 	body string
 }
@@ -87,6 +104,26 @@ func (n *commentNode) parse(p *parser) error {
 
 func (n *commentNode) String() string {
 	return fmt.Sprintf("{comment: %s}", n.body)
+}
+
+func (n *commentNode) pretty(w io.Writer, prefix string) error {
+	r := bufio.NewReader(strings.NewReader(n.body))
+	fmt.Fprintf(w, "%scomment{\n", prefix)
+	for {
+		line, err := r.ReadString('\n')
+		if err == io.EOF {
+			if line != "" {
+				fmt.Fprintf(w, "%s%s%s\n", prefix, indent, line)
+			}
+			break
+		}
+		if err != nil {
+			return err
+		}
+		fmt.Fprintf(w, "%s%s%s\n", prefix, indent, line)
+	}
+	fmt.Fprintf(w, "%s}\n", prefix)
+	return nil
 }
 
 type assignmentNode struct {
@@ -120,6 +157,14 @@ func (n *assignmentNode) parse(p *parser) error {
 
 func (n *assignmentNode) String() string {
 	return fmt.Sprintf("{assign: name=%s, val=%v}", n.name, n.value)
+}
+
+func (n *assignmentNode) pretty(w io.Writer, prefix string) error {
+	fmt.Fprintf(w, "%sassign{\n", prefix)
+	fmt.Fprintf(w, "%s%sname: %s\n", prefix, indent, n.name)
+	fmt.Fprintf(w, "%s%svalue: %v\n", prefix, indent, n.value)
+	fmt.Fprintf(w, "%s}\n", prefix)
+	return nil
 }
 
 type list []interface{}
