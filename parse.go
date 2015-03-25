@@ -40,9 +40,13 @@ func (p *parser) next() token {
 		p.backup = p.backup[:len(p.backup)-1]
 		return t
 	}
+SKIP_COMMENTS:
 	t, ok := <-p.input
 	if !ok {
 		return token{t_eof, "eof"}
+	}
+	if t.t == t_comment {
+		goto SKIP_COMMENTS
 	}
 	return t
 }
