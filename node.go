@@ -23,6 +23,7 @@ type node interface {
 	Type() nodeType
 	parse(*parser) error
 	pretty(io.Writer, string) error
+	eval(map[string]interface{}) error
 }
 
 type rootNode struct {
@@ -90,6 +91,15 @@ func (n *rootNode) pretty(w io.Writer, prefix string) error {
 	return nil
 }
 
+func (n *rootNode) eval(ctx map[string]interface{}) error {
+	for _, child := range n.children {
+		if err := child.eval(ctx); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 type commentNode struct {
 	body string
 }
@@ -123,6 +133,10 @@ func (n *commentNode) pretty(w io.Writer, prefix string) error {
 		fmt.Fprintf(w, "%s%s%s\n", prefix, indent, line)
 	}
 	fmt.Fprintf(w, "%s}\n", prefix)
+	return nil
+}
+
+func (n *commentNode) eval(ctx map[string]interface{}) error {
 	return nil
 }
 
@@ -164,6 +178,14 @@ func (n *assignmentNode) pretty(w io.Writer, prefix string) error {
 	fmt.Fprintf(w, "%s%sname: %s\n", prefix, indent, n.name)
 	fmt.Fprintf(w, "%s%svalue: %v\n", prefix, indent, n.value)
 	fmt.Fprintf(w, "%s}\n", prefix)
+	return nil
+}
+
+func (n *assignmentNode) eval(ctx map[string]interface{}) error {
+	if _, ok := ctx[n.name]; ok {
+		return fmt.Errorf("invalid re-declaration: %s", n.name)
+	}
+	ctx[n.name] = n.value
 	return nil
 }
 
