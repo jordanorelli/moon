@@ -16,9 +16,7 @@ var parseTests = []parseTest{
 	{
 		source: `# just a comment`,
 		root: &rootNode{
-			children: []node{
-				&commentNode{" just a comment"},
-			},
+			children: []node{},
 		},
 	},
 	{
@@ -59,15 +57,13 @@ var parseTests = []parseTest{
 		root: &rootNode{
 			children: []node{
 				&assignmentNode{"first_name", "jordan"},
-				&commentNode{" yep, that's my name"},
 				&assignmentNode{"last_name", "orelli"},
-				&commentNode{" comments should be able to follow other shit"},
 			},
 		},
 	},
 	{
 		source: `
-            heroes: ["lina", "cm"]
+            heroes: ["lina" "cm"]
         `,
 		root: &rootNode{
 			children: []node{
@@ -77,7 +73,7 @@ var parseTests = []parseTest{
 	},
 	{
 		source: `
-            nested: [["one", "two"], ["three", "four"]]
+            nested: [["one" "two"] ["three" "four"]]
         `,
 		root: &rootNode{
 			children: []node{
@@ -88,8 +84,8 @@ var parseTests = []parseTest{
 	{
 		source: `
             nested: [
-	           ["one", "two"],
-	           ["three", "four"],
+	           ["one" "two"]
+	           ["three" "four"]
 	        ]
         `,
 		root: &rootNode{
@@ -100,7 +96,7 @@ var parseTests = []parseTest{
 	},
 	{
 		source: `
-            admin: {first_name: "jordan", last_name: "orelli"}
+            admin: {first_name: "jordan" last_name: "orelli"}
 	    `,
 		root: &rootNode{
 			children: []node{
@@ -114,8 +110,8 @@ var parseTests = []parseTest{
 	{
 		source: `
             http: {
-	           port: 9000,
-	           routes: "/path/to/some/file",
+	           port: 9000
+	           routes: "/path/to/some/file"
             }
         `,
 		root: &rootNode{

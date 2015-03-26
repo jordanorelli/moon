@@ -38,30 +38,27 @@ var primitivesTests = []struct {
 	{`[]`, []token{{t_list_start, "["}, {t_list_end, "]"}}},
 	{`["item"]`, []token{{t_list_start, "["}, {t_string, "item"}, {t_list_end, "]"}}},
 	{`{}`, []token{{t_object_start, "{"}, {t_object_end, "}"}}},
-	{`{first_name: "jordan", last_name: "orelli"}`, []token{
+	{`{first_name: "jordan" last_name: "orelli"}`, []token{
 		{t_object_start, "{"},
 		{t_name, "first_name"},
 		{t_object_separator, ":"},
 		{t_string, "jordan"},
-		{t_list_separator, ","},
 		{t_name, "last_name"},
 		{t_object_separator, ":"},
 		{t_string, "orelli"},
 		{t_object_end, "}"},
 	}},
 	{`{
-        first_name: "jordan",
-        last_name: "orelli",
+        first_name: "jordan"
+        last_name: "orelli"
     }`, []token{
 		{t_object_start, "{"},
 		{t_name, "first_name"},
 		{t_object_separator, ":"},
 		{t_string, "jordan"},
-		{t_list_separator, ","},
 		{t_name, "last_name"},
 		{t_object_separator, ":"},
 		{t_string, "orelli"},
-		{t_list_separator, ","},
 		{t_object_end, "}"},
 	}},
 	{`0`, []token{{t_real_number, "0"}}},
@@ -81,12 +78,10 @@ var primitivesTests = []struct {
 		{t_real_number, "12.345"},
 		{t_list_end, "]"},
 	}},
-	{`[1, 2, 3]`, []token{
+	{`[1 2 3]`, []token{
 		{t_list_start, "["},
 		{t_real_number, "1"},
-		{t_list_separator, ","},
 		{t_real_number, "2"},
-		{t_list_separator, ","},
 		{t_real_number, "3"},
 		{t_list_end, "]"},
 	}},
