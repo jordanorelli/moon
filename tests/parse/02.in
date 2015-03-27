@@ -1,0 +1,17 @@
+a_string: "a string value"
+
+an_int: 1
+another_int: +9
+moar_int: -12
+
+a_float: 1.0
+another_float: -.9
+extra_floaty: +1.2
+
+complex1: 1+1i
+complex2: 1+0i
+complex3: 1.3+4.7i
+complex4: -4.2+8.9i
+complex5: +4.2-8.9i
+
+

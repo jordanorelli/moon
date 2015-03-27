@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"io"
-	"strconv"
 )
 
 const ()
@@ -87,9 +86,12 @@ func (p *parser) parseValue() (node, error) {
 				return nil, err
 			}
 			return n, nil
-		// case t_real_number, t_imaginary_number:
-		// 	p.unread(t)
-		// 	return p.number()
+		case t_real_number:
+			n := new(numberNode)
+			if err := n.parse(p); err != nil {
+				return nil, err
+			}
+			return n, nil
 		// case t_list_start:
 		// 	return p.parseList(make(list, 0, 4))
 		// case t_object_start:
@@ -148,32 +150,4 @@ func (p *parser) parseObject(obj object) (object, error) {
 	default:
 		return p.parseObject(obj)
 	}
-}
-
-func (p *parser) number() (interface{}, error) {
-	t := p.next()
-	if t.t != t_real_number {
-		return nil, fmt.Errorf("unexpected %s token while parsing number", t.t)
-	}
-
-	if p.peek().t == t_imaginary_number {
-		var c complex128
-		s := t.s + p.next().s
-		if _, err := fmt.Sscan(s, &c); err != nil {
-			return nil, fmt.Errorf("ungood imaginary number format %s: %s", s, err)
-		}
-		return c, nil
-	}
-
-	i, err := strconv.ParseInt(t.s, 0, 64)
-	if err == nil {
-		return int(i), nil
-	}
-
-	f, err := strconv.ParseFloat(t.s, 64)
-	if err == nil {
-		return f, nil
-	}
-
-	return nil, fmt.Errorf("this token broke the number parser: %s", t)
 }

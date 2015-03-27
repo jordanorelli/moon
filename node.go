@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"strconv"
 	"strings"
 )
 
@@ -16,6 +17,7 @@ const (
 	n_comment
 	n_assignment
 	n_string
+	n_number
 )
 
 var indent = "  "
@@ -214,6 +216,79 @@ func (s *stringNode) pretty(w io.Writer, prefix string) error {
 
 func (s *stringNode) eval(ctx map[string]interface{}) (interface{}, error) {
 	return string(*s), nil
+}
+
+type numberType int
+
+const (
+	num_int numberType = iota
+	num_float
+	num_complex
+)
+
+type numberNode struct {
+	t numberType
+	c complex128
+	i int
+	f float64
+}
+
+func (n *numberNode) Type() nodeType {
+	return n_number
+}
+
+func (n *numberNode) parse(p *parser) error {
+	t := p.next()
+	if t.t != t_real_number {
+		return fmt.Errorf("unexpected %s token while parsing number", t.t)
+	}
+
+	if p.peek().t == t_imaginary_number {
+		n.t = num_complex
+		s := t.s + p.next().s
+		if _, err := fmt.Sscan(s, &n.c); err != nil {
+			return fmt.Errorf("ungood imaginary number format %s: %s", s, err)
+		}
+		return nil
+	}
+
+	i, err := strconv.ParseInt(t.s, 0, 64)
+	if err == nil {
+		n.t = num_int
+		n.i = int(i)
+		return nil
+	}
+
+	f, err := strconv.ParseFloat(t.s, 64)
+	if err == nil {
+		n.t = num_float
+		n.f = f
+		return nil
+	}
+
+	return fmt.Errorf("this token broke the number parser: %s", t)
+}
+
+func (n *numberNode) pretty(w io.Writer, prefix string) error {
+	v, err := n.eval(nil)
+	if err != nil {
+		return err
+	}
+	fmt.Fprintf(w, "%s%v\n", prefix, v)
+	return nil
+}
+
+func (n *numberNode) eval(ctx map[string]interface{}) (interface{}, error) {
+	switch n.t {
+	case num_int:
+		return n.i, nil
+	case num_float:
+		return n.f, nil
+	case num_complex:
+		return n.c, nil
+	default:
+		panic("whoerps")
+	}
 }
 
 type list []interface{}

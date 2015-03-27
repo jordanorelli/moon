@@ -1,0 +1,50 @@
+root{
+  assign{
+    name: a_string
+    value: a string value
+  }
+  assign{
+    name: an_int
+    value: 1
+  }
+  assign{
+    name: another_int
+    value: 9
+  }
+  assign{
+    name: moar_int
+    value: -12
+  }
+  assign{
+    name: a_float
+    value: 1
+  }
+  assign{
+    name: another_float
+    value: -0.9
+  }
+  assign{
+    name: extra_floaty
+    value: 1.2
+  }
+  assign{
+    name: complex1
+    value: (1+1i)
+  }
+  assign{
+    name: complex2
+    value: (1+0i)
+  }
+  assign{
+    name: complex3
+    value: (1.3+4.7i)
+  }
+  assign{
+    name: complex4
+    value: (-4.2+8.9i)
+  }
+  assign{
+    name: complex5
+    value: (4.2-8.9i)
+  }
+}
