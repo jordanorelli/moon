@@ -143,7 +143,7 @@ func (n *commentNode) eval(ctx map[string]interface{}) (interface{}, error) {
 
 type assignmentNode struct {
 	name  string
-	value interface{}
+	value node
 }
 
 func (n *assignmentNode) Type() nodeType {
@@ -177,7 +177,9 @@ func (n *assignmentNode) String() string {
 func (n *assignmentNode) pretty(w io.Writer, prefix string) error {
 	fmt.Fprintf(w, "%sassign{\n", prefix)
 	fmt.Fprintf(w, "%s%sname: %s\n", prefix, indent, n.name)
-	fmt.Fprintf(w, "%s%svalue: %v\n", prefix, indent, n.value)
+	if err := n.value.pretty(w, fmt.Sprintf("%s%svalue: ", prefix, indent)); err != nil {
+		return err
+	}
 	fmt.Fprintf(w, "%s}\n", prefix)
 	return nil
 }
@@ -192,16 +194,21 @@ func (n *assignmentNode) eval(ctx map[string]interface{}) (interface{}, error) {
 
 type stringNode string
 
-func (s stringNode) Type() nodeType {
+func (s *stringNode) Type() nodeType {
 	return n_string
 }
 
 func (s *stringNode) parse(p *parser) error {
+	t := p.next()
+	if t.t != t_string {
+		return fmt.Errorf("unexpected %s while looking for string token", t.t)
+	}
+	*s = stringNode(t.s)
 	return nil
 }
 
 func (s *stringNode) pretty(w io.Writer, prefix string) error {
-	_, err := fmt.Fprintf(w, "%s%s", prefix, string(*s))
+	_, err := fmt.Fprintf(w, "%s%s\n", prefix, string(*s))
 	return err
 }
 

@@ -73,23 +73,27 @@ func (p *parser) ensureNext(tt tokenType, context string) error {
 
 // parse the next value.  This is to be executed in a context where we know we
 // want something that is a value to come next, such as after an equals sign.
-func (p *parser) parseValue() (interface{}, error) {
+func (p *parser) parseValue() (node, error) {
 	for {
-		t := p.next()
+		t := p.peek()
 		switch t.t {
 		case t_error:
 			return nil, fmt.Errorf("parse error: saw lex error when looking for value: %v", t.s)
 		case t_eof:
 			return nil, fmt.Errorf("parse error: unexpected eof when looking for value")
 		case t_string:
-			return t.s, nil
-		case t_real_number, t_imaginary_number:
-			p.unread(t)
-			return p.number()
-		case t_list_start:
-			return p.parseList(make(list, 0, 4))
-		case t_object_start:
-			return p.parseObject(make(object))
+			n := new(stringNode)
+			if err := n.parse(p); err != nil {
+				return nil, err
+			}
+			return n, nil
+		// case t_real_number, t_imaginary_number:
+		// 	p.unread(t)
+		// 	return p.number()
+		// case t_list_start:
+		// 	return p.parseList(make(list, 0, 4))
+		// case t_object_start:
+		// 	return p.parseObject(make(object))
 		default:
 			return nil, fmt.Errorf("parse error: unexpected %v token while looking for value", t.t)
 		}
