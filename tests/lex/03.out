@@ -1,0 +1,12 @@
+{t_real_number -1}
+{t_imaginary_number +2i}
+{t_real_number -1}
+{t_imaginary_number -2i}
+{t_real_number 1}
+{t_imaginary_number +2i}
+{t_real_number 1}
+{t_imaginary_number -2i}
+{t_real_number +1}
+{t_imaginary_number +2i}
+{t_real_number +1}
+{t_imaginary_number -2i}

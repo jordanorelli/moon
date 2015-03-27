@@ -1,0 +1,24 @@
+{t_list_start [}
+{t_list_end ]}
+{t_list_start [}
+{t_real_number 1}
+{t_real_number 2}
+{t_real_number 3}
+{t_list_end ]}
+{t_list_start [}
+{t_string string one}
+{t_string string two}
+{t_list_end ]}
+{t_list_start [}
+{t_list_start [}
+{t_real_number 1}
+{t_real_number 2}
+{t_real_number 3}
+{t_list_end ]}
+{t_list_start [}
+{t_list_end ]}
+{t_list_start [}
+{t_string string one}
+{t_string string two}
+{t_list_end ]}
+{t_list_end ]}
