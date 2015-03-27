@@ -11,7 +11,7 @@ import (
 	"testing"
 )
 
-func runTest(t *testing.T, basepath, inpath, outpath string) {
+func runLexTest(t *testing.T, basepath, inpath, outpath string) {
 	in, err := os.Open(inpath)
 	if err != nil {
 		t.Errorf("unable to open input file %s: %s", inpath, err)
@@ -54,6 +54,6 @@ func TestLex(t *testing.T) {
 	}
 
 	for _, fname := range files {
-		runTest(t, "tests/lex/", fname, strings.Replace(fname, "in", "out", -1))
+		runLexTest(t, "tests/lex/", fname, strings.Replace(fname, "in", "out", -1))
 	}
 }
