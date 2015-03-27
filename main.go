@@ -60,7 +60,7 @@ func eval(r io.Reader) (map[string]interface{}, error) {
 	}
 
 	ctx := make(map[string]interface{})
-	if err := n.eval(ctx); err != nil {
+	if _, err := n.eval(ctx); err != nil {
 		return nil, fmt.Errorf("eval error: %s\n", err)
 	}
 	return ctx, nil

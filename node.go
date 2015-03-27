@@ -15,6 +15,7 @@ const (
 	n_root
 	n_comment
 	n_assignment
+	n_string
 )
 
 var indent = "  "
@@ -23,7 +24,7 @@ type node interface {
 	Type() nodeType
 	parse(*parser) error
 	pretty(io.Writer, string) error
-	eval(map[string]interface{}) error
+	eval(map[string]interface{}) (interface{}, error)
 }
 
 type rootNode struct {
@@ -91,13 +92,13 @@ func (n *rootNode) pretty(w io.Writer, prefix string) error {
 	return nil
 }
 
-func (n *rootNode) eval(ctx map[string]interface{}) error {
+func (n *rootNode) eval(ctx map[string]interface{}) (interface{}, error) {
 	for _, child := range n.children {
-		if err := child.eval(ctx); err != nil {
-			return err
+		if _, err := child.eval(ctx); err != nil {
+			return nil, err
 		}
 	}
-	return nil
+	return nil, nil
 }
 
 type commentNode struct {
@@ -136,8 +137,8 @@ func (n *commentNode) pretty(w io.Writer, prefix string) error {
 	return nil
 }
 
-func (n *commentNode) eval(ctx map[string]interface{}) error {
-	return nil
+func (n *commentNode) eval(ctx map[string]interface{}) (interface{}, error) {
+	return nil, nil
 }
 
 type assignmentNode struct {
@@ -181,12 +182,31 @@ func (n *assignmentNode) pretty(w io.Writer, prefix string) error {
 	return nil
 }
 
-func (n *assignmentNode) eval(ctx map[string]interface{}) error {
+func (n *assignmentNode) eval(ctx map[string]interface{}) (interface{}, error) {
 	if _, ok := ctx[n.name]; ok {
-		return fmt.Errorf("invalid re-declaration: %s", n.name)
+		return nil, fmt.Errorf("invalid re-declaration: %s", n.name)
 	}
 	ctx[n.name] = n.value
+	return nil, nil
+}
+
+type stringNode string
+
+func (s stringNode) Type() nodeType {
+	return n_string
+}
+
+func (s *stringNode) parse(p *parser) error {
 	return nil
+}
+
+func (s *stringNode) pretty(w io.Writer, prefix string) error {
+	_, err := fmt.Fprintf(w, "%s%s", prefix, string(*s))
+	return err
+}
+
+func (s *stringNode) eval(ctx map[string]interface{}) (interface{}, error) {
+	return string(*s), nil
 }
 
 type list []interface{}
