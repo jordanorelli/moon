@@ -192,7 +192,11 @@ func (n *assignmentNode) eval(ctx map[string]interface{}) (interface{}, error) {
 	if _, ok := ctx[n.name]; ok {
 		return nil, fmt.Errorf("invalid re-declaration: %s", n.name)
 	}
-	ctx[n.name] = n.value
+	v, err := n.value.eval(ctx)
+	if err != nil {
+		return nil, err
+	}
+	ctx[n.name] = v
 	return nil, nil
 }
 

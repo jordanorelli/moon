@@ -1,3 +1,9 @@
+root_int: 1
+root_float: 1.2
+root_exp: 1e9
+root_hex: 0xabcde
+root_oct: 0777
+
 an_object: {
     item_one: 1
     item_two: "two"

@@ -1,6 +1,36 @@
 root:
   assign:
     name:
+      root_int
+    value:
+      number:
+        1
+  assign:
+    name:
+      root_float
+    value:
+      number:
+        1.2
+  assign:
+    name:
+      root_exp
+    value:
+      number:
+        1e+09
+  assign:
+    name:
+      root_hex
+    value:
+      number:
+        703710
+  assign:
+    name:
+      root_oct
+    value:
+      number:
+        511
+  assign:
+    name:
       an_object
     value:
       object:
