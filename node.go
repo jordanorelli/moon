@@ -85,13 +85,12 @@ func (n *rootNode) String() string {
 }
 
 func (n *rootNode) pretty(w io.Writer, prefix string) error {
-	fmt.Fprintf(w, "%sroot{\n", prefix)
+	fmt.Fprintf(w, "%sroot:\n", prefix)
 	for _, child := range n.children {
 		if err := child.pretty(w, prefix+indent); err != nil {
 			return err
 		}
 	}
-	fmt.Fprintf(w, "%s}\n", prefix)
 	return nil
 }
 
@@ -121,8 +120,8 @@ func (n *commentNode) String() string {
 }
 
 func (n *commentNode) pretty(w io.Writer, prefix string) error {
+	fmt.Fprintf(w, "%scomment:\n", prefix)
 	r := bufio.NewReader(strings.NewReader(n.body))
-	fmt.Fprintf(w, "%scomment{\n", prefix)
 	for {
 		line, err := r.ReadString('\n')
 		if err == io.EOF {
@@ -136,7 +135,6 @@ func (n *commentNode) pretty(w io.Writer, prefix string) error {
 		}
 		fmt.Fprintf(w, "%s%s%s\n", prefix, indent, line)
 	}
-	fmt.Fprintf(w, "%s}\n", prefix)
 	return nil
 }
 
@@ -178,12 +176,13 @@ func (n *assignmentNode) String() string {
 }
 
 func (n *assignmentNode) pretty(w io.Writer, prefix string) error {
-	fmt.Fprintf(w, "%sassign{\n", prefix)
-	fmt.Fprintf(w, "%s%sname: %s\n", prefix, indent, n.name)
-	if err := n.value.pretty(w, fmt.Sprintf("%s%svalue: ", prefix, indent)); err != nil {
+	fmt.Fprintf(w, "%sassign:\n", prefix)
+	fmt.Fprintf(w, "%s%sname:\n", prefix, indent)
+	fmt.Fprintf(w, "%s%s%s%s\n", prefix, indent, indent, n.name)
+	fmt.Fprintf(w, "%s%svalue:\n", prefix, indent)
+	if err := n.value.pretty(w, prefix+indent+indent); err != nil {
 		return err
 	}
-	fmt.Fprintf(w, "%s}\n", prefix)
 	return nil
 }
 
@@ -211,7 +210,8 @@ func (s *stringNode) parse(p *parser) error {
 }
 
 func (s *stringNode) pretty(w io.Writer, prefix string) error {
-	_, err := fmt.Fprintf(w, "%s%s\n", prefix, string(*s))
+	fmt.Fprintf(w, "%sstring:\n", prefix)
+	_, err := fmt.Fprintf(w, "%s%s%s\n", prefix, indent, string(*s))
 	return err
 }
 
@@ -275,7 +275,7 @@ func (n *numberNode) pretty(w io.Writer, prefix string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Fprintf(w, "%s%v\n", prefix, v)
+	fmt.Fprintf(w, "%snumber:\n%s%s%v\n", prefix, prefix, indent, v)
 	return nil
 }
 
@@ -320,13 +320,12 @@ func (l *listNode) parse(p *parser) error {
 }
 
 func (l *listNode) pretty(w io.Writer, prefix string) error {
-	fmt.Fprintf(w, "%slist{\n", prefix)
+	fmt.Fprintf(w, "%slist:\n", prefix)
 	for _, n := range *l {
 		if err := n.pretty(w, prefix+indent); err != nil {
 			return err
 		}
 	}
-	fmt.Fprintf(w, "%s}\n", prefix)
 	return nil
 }
 
