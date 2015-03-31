@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -19,6 +20,7 @@ const (
 	n_string
 	n_number
 	n_list
+	n_object
 )
 
 var indent = "  "
@@ -341,5 +343,66 @@ func (l *listNode) eval(ctx map[string]interface{}) (interface{}, error) {
 	return out, nil
 }
 
-type list []interface{}
-type object map[string]interface{}
+type objectNode map[string]node
+
+func (o *objectNode) Type() nodeType {
+	return n_object
+}
+
+func (o *objectNode) parse(p *parser) error {
+	if p.peek().t == t_object_end {
+		p.next()
+		return nil
+	}
+	if err := p.ensureNext(t_name, "looking for object field name in parseObject"); err != nil {
+		return err
+	}
+	field_name := p.next().s
+	if err := p.ensureNext(t_object_separator, "looking for object separator in parseObject"); err != nil {
+		return err
+	}
+	p.next()
+
+	if n, err := p.parseValue(); err != nil {
+		return err
+	} else {
+		(*o)[field_name] = n
+	}
+
+	switch t := p.peek(); t.t {
+	case t_object_end:
+		p.next()
+		return nil
+	default:
+		return o.parse(p)
+	}
+}
+
+func (o *objectNode) pretty(w io.Writer, prefix string) error {
+	fmt.Fprintf(w, "%sobject:\n", prefix)
+	keys := make([]string, 0, len(*o))
+	for key := range *o {
+		keys = append(keys, key)
+	}
+	sort.Strings(keys)
+	for _, key := range keys {
+		fmt.Fprintf(w, "%s%s:\n", prefix+indent, key)
+		err := (*o)[key].pretty(w, prefix+indent+indent)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (o *objectNode) eval(ctx map[string]interface{}) (interface{}, error) {
+	out := make(map[string]interface{}, len(*o))
+	for name, node := range *o {
+		v, err := node.eval(ctx)
+		if err != nil {
+			return nil, err
+		}
+		out[name] = v
+	}
+	return out, nil
+}

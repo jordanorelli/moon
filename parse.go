@@ -99,40 +99,15 @@ func (p *parser) parseValue() (node, error) {
 				return nil, err
 			}
 			return n, nil
-		// 	return p.parseList(make(list, 0, 4))
-		// case t_object_start:
-		// 	return p.parseObject(make(object))
+		case t_object_start:
+			p.next()
+			n := &objectNode{}
+			if err := n.parse(p); err != nil {
+				return nil, err
+			}
+			return n, nil
 		default:
 			return nil, fmt.Errorf("parse error: unexpected %v token while looking for value", t.t)
 		}
-	}
-}
-
-func (p *parser) parseObject(obj object) (object, error) {
-	if p.peek().t == t_object_end {
-		p.next()
-		return obj, nil
-	}
-	if err := p.ensureNext(t_name, "looking for object field name in parseObject"); err != nil {
-		return nil, err
-	}
-	field_name := p.next().s
-	if err := p.ensureNext(t_object_separator, "looking for object separator in parseObject"); err != nil {
-		return nil, err
-	}
-	p.next()
-
-	if v, err := p.parseValue(); err != nil {
-		return nil, err
-	} else {
-		obj[field_name] = v
-	}
-
-	switch t := p.peek(); t.t {
-	case t_object_end:
-		p.next()
-		return obj, nil
-	default:
-		return p.parseObject(obj)
 	}
 }
