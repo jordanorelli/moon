@@ -18,6 +18,7 @@ const (
 	n_assignment
 	n_string
 	n_number
+	n_list
 )
 
 var indent = "  "
@@ -289,6 +290,56 @@ func (n *numberNode) eval(ctx map[string]interface{}) (interface{}, error) {
 	default:
 		panic("whoerps")
 	}
+}
+
+type listNode []node
+
+func (l *listNode) Type() nodeType {
+	return n_list
+}
+
+func (l *listNode) parse(p *parser) error {
+	if p.peek().t == t_list_end {
+		p.next()
+		return nil
+	}
+
+	if n, err := p.parseValue(); err != nil {
+		return err
+	} else {
+		*l = append(*l, n)
+	}
+
+	switch t := p.peek(); t.t {
+	case t_list_end:
+		p.next()
+		return nil
+	default:
+		return l.parse(p)
+	}
+}
+
+func (l *listNode) pretty(w io.Writer, prefix string) error {
+	fmt.Fprintf(w, "%slist{\n", prefix)
+	for _, n := range *l {
+		if err := n.pretty(w, prefix+indent); err != nil {
+			return err
+		}
+	}
+	fmt.Fprintf(w, "%s}\n", prefix)
+	return nil
+}
+
+func (l *listNode) eval(ctx map[string]interface{}) (interface{}, error) {
+	out := make([]interface{}, 0, len(*l))
+	for _, n := range *l {
+		v, err := n.eval(ctx)
+		if err != nil {
+			return nil, err
+		}
+		out = append(out, v)
+	}
+	return out, nil
 }
 
 type list []interface{}

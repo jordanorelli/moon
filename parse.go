@@ -92,34 +92,19 @@ func (p *parser) parseValue() (node, error) {
 				return nil, err
 			}
 			return n, nil
-		// case t_list_start:
+		case t_list_start:
+			p.next()
+			n := new(listNode)
+			if err := n.parse(p); err != nil {
+				return nil, err
+			}
+			return n, nil
 		// 	return p.parseList(make(list, 0, 4))
 		// case t_object_start:
 		// 	return p.parseObject(make(object))
 		default:
 			return nil, fmt.Errorf("parse error: unexpected %v token while looking for value", t.t)
 		}
-	}
-}
-
-func (p *parser) parseList(l list) (list, error) {
-	if p.peek().t == t_list_end {
-		p.next()
-		return l, nil
-	}
-
-	if v, err := p.parseValue(); err != nil {
-		return nil, err
-	} else {
-		l = append(l, v)
-	}
-
-	switch t := p.peek(); t.t {
-	case t_list_end:
-		p.next()
-		return l, nil
-	default:
-		return p.parseList(l)
 	}
 }
 
