@@ -21,6 +21,7 @@ const (
 	n_number
 	n_list
 	n_object
+	n_variable
 )
 
 var indent = "  "
@@ -409,4 +410,33 @@ func (o *objectNode) eval(ctx map[string]interface{}) (interface{}, error) {
 		out[name] = v
 	}
 	return out, nil
+}
+
+type variableNode string
+
+func (v *variableNode) Type() nodeType {
+	return n_variable
+}
+
+func (v *variableNode) parse(p *parser) error {
+	t := p.next()
+	if t.t != t_name {
+		return fmt.Errorf("unexpected %s token when parsing variable", t.t)
+	}
+	*v = variableNode(t.s)
+	return nil
+}
+
+func (v *variableNode) pretty(w io.Writer, prefix string) error {
+	fmt.Fprintf(w, "%svariable:\n", prefix)
+	fmt.Fprintf(w, "%s%s\n", prefix+indent, string(*v))
+	return nil
+}
+
+func (v *variableNode) eval(ctx map[string]interface{}) (interface{}, error) {
+	value, ok := ctx[string(*v)]
+	if !ok {
+		return nil, fmt.Errorf("undefined variable: %s", *v)
+	}
+	return value, nil
 }

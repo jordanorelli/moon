@@ -1,0 +1,13 @@
+root:
+  assign:
+    name:
+      an_item
+    value:
+      string:
+        this is the value of the item
+  assign:
+    name:
+      a_variable
+    value:
+      variable:
+        an_item

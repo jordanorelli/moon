@@ -32,6 +32,5 @@ other_hash: {
 
 item_one: "this is item one"
 
-# we should be able to reference variables defined earlier
-# (this doesn't work yet)
-# item_two: item_one
+# we may reference an item that was defined earlier
+item_two: item_one
