@@ -30,10 +30,8 @@ other_hash: {
     key_4: ["five" 6 7.8]
 }
 
-item_one: "this is item one"
-
 # we may reference an item that was defined earlier
-item_two: item_one
+repeat_hash: hash
 
 # items can be hidden.  i.e., they're only valid in the parse and eval stage as
 # intermediate values internal to the config file; they are *not* visible to

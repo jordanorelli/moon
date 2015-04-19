@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 )
 
 func input(n int) io.ReadCloser {
@@ -62,6 +63,11 @@ func eval(r io.Reader) (map[string]interface{}, error) {
 	ctx := make(map[string]interface{})
 	if _, err := n.eval(ctx); err != nil {
 		return nil, fmt.Errorf("eval error: %s\n", err)
+	}
+	for name, _ := range ctx {
+		if strings.HasPrefix(name, ".") {
+			delete(ctx, name)
+		}
 	}
 	return ctx, nil
 }
