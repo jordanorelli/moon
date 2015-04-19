@@ -412,7 +412,9 @@ func (o *objectNode) eval(ctx map[string]interface{}) (interface{}, error) {
 	return out, nil
 }
 
-type variableNode string
+type variableNode struct {
+	name string
+}
 
 func (v *variableNode) Type() nodeType {
 	return n_variable
@@ -423,20 +425,24 @@ func (v *variableNode) parse(p *parser) error {
 	if t.t != t_name {
 		return fmt.Errorf("unexpected %s token when parsing variable", t.t)
 	}
-	*v = variableNode(t.s)
+	v.name = t.s
 	return nil
 }
 
 func (v *variableNode) pretty(w io.Writer, prefix string) error {
 	fmt.Fprintf(w, "%svariable:\n", prefix)
-	fmt.Fprintf(w, "%s%s\n", prefix+indent, string(*v))
+	fmt.Fprintf(w, "%s%s\n", prefix+indent, v.name)
 	return nil
 }
 
 func (v *variableNode) eval(ctx map[string]interface{}) (interface{}, error) {
-	value, ok := ctx[string(*v)]
+	value, ok := ctx[v.name]
 	if !ok {
 		return nil, fmt.Errorf("undefined variable: %s", *v)
 	}
 	return value, nil
+}
+
+func (v *variableNode) isHidden() bool {
+	return strings.HasPrefix(v.name, ".")
 }
