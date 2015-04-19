@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"github.com/jordanorelli/moon/lib"
 	"io"
 	"os"
-	"strings"
 )
 
 func input(n int) io.ReadCloser {
@@ -25,51 +25,10 @@ func check() {
 	r := input(1)
 	defer r.Close()
 
-	_, err := parse(r)
+	_, err := moon.Read(r)
 	if err != nil {
 		bail(1, "parse error: %s", err)
 	}
-}
-
-func lexx() {
-	r := input(1)
-	defer r.Close()
-
-	c := lex(r)
-	for t := range c {
-		fmt.Println(t)
-	}
-}
-
-func parsse() {
-	r := input(1)
-	defer r.Close()
-
-	n, err := parse(r)
-	if err != nil {
-		bail(1, "parse error: %s", err)
-	}
-	if err := n.pretty(os.Stdout, ""); err != nil {
-		bail(1, "output error: %s", err)
-	}
-}
-
-func eval(r io.Reader) (map[string]interface{}, error) {
-	n, err := parse(r)
-	if err != nil {
-		return nil, fmt.Errorf("parse error: %s\n", err)
-	}
-
-	ctx := make(map[string]interface{})
-	if _, err := n.eval(ctx); err != nil {
-		return nil, fmt.Errorf("eval error: %s\n", err)
-	}
-	for name, _ := range ctx {
-		if strings.HasPrefix(name, ".") {
-			delete(ctx, name)
-		}
-	}
-	return ctx, nil
 }
 
 func to() {
@@ -84,11 +43,11 @@ func to() {
 }
 
 func to_json(n int) {
-	v, err := eval(input(n))
+	conf, err := moon.Read(input(n))
 	if err != nil {
 		bail(1, "input error: %s", err)
 	}
-	b, err := json.MarshalIndent(v, "", "    ")
+	b, err := json.MarshalIndent(conf, "", "    ")
 	if err != nil {
 		bail(1, "encode error: %s", err)
 	}
@@ -111,10 +70,6 @@ func main() {
 	switch flag.Arg(0) {
 	case "check":
 		check()
-	case "lex":
-		lexx()
-	case "parse":
-		parsse()
 	case "to":
 		to()
 	case "":

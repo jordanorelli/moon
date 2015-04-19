@@ -1,8 +1,7 @@
-package main
+package moon
 
 import (
 	"bytes"
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -11,7 +10,7 @@ import (
 	"testing"
 )
 
-func runLexTest(t *testing.T, basepath, inpath, outpath string) {
+func runParseTest(t *testing.T, basepath, inpath, outpath string) {
 	in, err := os.Open(inpath)
 	if err != nil {
 		t.Errorf("unable to open input file %s: %s", inpath, err)
@@ -33,9 +32,16 @@ func runLexTest(t *testing.T, basepath, inpath, outpath string) {
 	}
 
 	var buf bytes.Buffer
-	c := lex(in)
-	for t := range c {
-		fmt.Fprintln(&buf, t)
+	root, err := parse(in)
+	if err != nil {
+		t.Logf("test %d: in: %s out: %s", n, inpath, outpath)
+		t.Errorf("parse error in test %d: %s", n, err)
+		return
+	}
+	if err := root.pretty(&buf, ""); err != nil {
+		t.Logf("test %d: in: %s out: %s", n, inpath, outpath)
+		t.Errorf("output error in test %d: %s", n, err)
+		return
 	}
 
 	if !bytes.Equal(buf.Bytes(), expected) {
@@ -46,14 +52,14 @@ func runLexTest(t *testing.T, basepath, inpath, outpath string) {
 	}
 }
 
-func TestLex(t *testing.T) {
-	files, err := filepath.Glob("tests/lex/*.in")
+func TestParse(t *testing.T) {
+	files, err := filepath.Glob("tests/parse/*.in")
 	if err != nil {
 		t.Errorf("unable to find test files: %s", err)
 		return
 	}
 
 	for _, fname := range files {
-		runLexTest(t, "tests/lex/", fname, strings.Replace(fname, "in", "out", -1))
+		runParseTest(t, "tests/parse/", fname, strings.Replace(fname, "in", "out", -1))
 	}
 }

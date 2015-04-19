@@ -1,6 +1,7 @@
-package main
+package moon
 
 import (
+	"encoding/json"
 	"fmt"
 )
 
@@ -48,4 +49,8 @@ func (c *Config) GetString(key string) string {
 		return s
 	}
 	return ""
+}
+
+func (c *Config) MarshalJSON() ([]byte, error) {
+	return json.Marshal(c.items)
 }

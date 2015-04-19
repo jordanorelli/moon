@@ -1,11 +1,29 @@
-package main
+package moon
 
 import (
 	"fmt"
 	"io"
+	"strings"
 )
 
 const ()
+
+func Read(r io.Reader) (*Config, error) {
+	tree, err := parse(r)
+	if err != nil {
+		return nil, err
+	}
+	ctx := make(map[string]interface{})
+	if _, err := tree.eval(ctx); err != nil {
+		return nil, fmt.Errorf("eval error: %s\n", err)
+	}
+	for name, _ := range ctx {
+		if strings.HasPrefix(name, ".") {
+			delete(ctx, name)
+		}
+	}
+	return &Config{items: ctx}, nil
+}
 
 func parse(r io.Reader) (node, error) {
 	p := &parser{
