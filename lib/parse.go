@@ -1,6 +1,7 @@
 package moon
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"strings"
@@ -8,6 +9,10 @@ import (
 
 const ()
 
+// Reads a moon document from a given io.Reader. The io.Reader is advanced to
+// EOF. The reader is not closed after reading, since it's an io.Reader and not
+// an io.ReadCloser. In the event of error, the state that the source reader
+// will be left in is undefined.
 func Read(r io.Reader) (*Doc, error) {
 	tree, err := parse(r)
 	if err != nil {
@@ -23,6 +28,18 @@ func Read(r io.Reader) (*Doc, error) {
 		}
 	}
 	return &Doc{items: ctx}, nil
+}
+
+// Reads a moon document from a string. This is purely a convenience method;
+// all it does is create a buffer and call the moon.Read function.
+func ReadString(source string) (*Doc, error) {
+	return Read(strings.NewReader(source))
+}
+
+// Reads a moon document from a slice of bytes. This is purely a concenience
+// method; like ReadString, it simply creates a buffer and calls moon.Read
+func ReadBytes(b []byte) (*Doc, error) {
+	return Read(bytes.NewBuffer(b))
 }
 
 func parse(r io.Reader) (node, error) {

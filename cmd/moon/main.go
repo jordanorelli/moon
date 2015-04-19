@@ -54,6 +54,19 @@ func to_json(n int) {
 	os.Stdout.Write(b)
 }
 
+func get() {
+	docpath := flag.Arg(1)
+	doc, err := moon.Read(input(2))
+	if err != nil {
+		bail(1, "input error: %s", err)
+	}
+	var v interface{}
+	if err := doc.Get(docpath, &v); err != nil {
+		bail(1, "error reading value at path %s: %s", docpath, err)
+	}
+	fmt.Println(v)
+}
+
 func bail(status int, t string, args ...interface{}) {
 	var w io.Writer
 	if status == 0 {
@@ -72,8 +85,10 @@ func main() {
 		check()
 	case "to":
 		to()
+	case "get":
+		get()
 	case "":
-		bail(1, "must specify an action.\nvalid actions: check lex parse to")
+		bail(1, "must specify an action.\nvalid actions: check to get")
 	default:
 		bail(1, "no such action:%s", flag.Arg(0))
 	}
