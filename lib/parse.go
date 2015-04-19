@@ -8,7 +8,7 @@ import (
 
 const ()
 
-func Read(r io.Reader) (*Config, error) {
+func Read(r io.Reader) (*Doc, error) {
 	tree, err := parse(r)
 	if err != nil {
 		return nil, err
@@ -22,7 +22,7 @@ func Read(r io.Reader) (*Config, error) {
 			delete(ctx, name)
 		}
 	}
-	return &Config{items: ctx}, nil
+	return &Doc{items: ctx}, nil
 }
 
 func parse(r io.Reader) (node, error) {

@@ -43,11 +43,11 @@ func to() {
 }
 
 func to_json(n int) {
-	conf, err := moon.Read(input(n))
+	doc, err := moon.Read(input(n))
 	if err != nil {
 		bail(1, "input error: %s", err)
 	}
-	b, err := json.MarshalIndent(conf, "", "    ")
+	b, err := json.MarshalIndent(doc, "", "    ")
 	if err != nil {
 		bail(1, "encode error: %s", err)
 	}
