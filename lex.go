@@ -110,6 +110,12 @@ func (l *lexer) next() rune {
 	return r
 }
 
+func (l *lexer) peek() rune {
+	r := l.next()
+	l.unread(r)
+	return r
+}
+
 func (l *lexer) keep(r rune) {
 	if l.buf == nil {
 		l.buf = make([]rune, 0, 18)
@@ -211,7 +217,10 @@ func lexRoot(l *lexer) stateFn {
 		l.keep(r)
 		l.emit(t_object_separator)
 		return lexRoot
-	case strings.IndexRune(".+-0123456789", r) >= 0:
+	case r == '.':
+		l.keep(r)
+		return lexAfterPeriod
+	case strings.IndexRune("+-0123456789", r) >= 0:
 		l.unread(r)
 		return lexNumber
 	case unicode.IsSpace(r):
@@ -224,6 +233,20 @@ func lexRoot(l *lexer) stateFn {
 		return lexType
 	default:
 		return lexErrorf("unexpected rune in lexRoot: %c", r)
+	}
+}
+
+func lexAfterPeriod(l *lexer) stateFn {
+	r := l.next()
+	switch {
+	case strings.IndexRune("+-0123456789", r) >= 0:
+		l.unread(r)
+		return lexNumber
+	case unicode.IsLower(r):
+		l.keep(r)
+		return lexName
+	default:
+		return lexErrorf("unexpected rune after period: %c", r)
 	}
 }
 

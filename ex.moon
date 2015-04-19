@@ -34,3 +34,24 @@ item_one: "this is item one"
 
 # we may reference an item that was defined earlier
 item_two: item_one
+
+# items can be hidden.  i.e., they're only valid in the parse and eval stage as
+# intermediate values internal to the config file; they are *not* visible to
+# the host program.  This is generally useful for composing larger, more
+# complicated things.
+.hidden_item: "it has a value"
+visible_item: .hidden_item
+
+.person_one: {
+    name: "the first name here"
+    age: 28
+    hometown: "crooklyn"
+}
+
+.person_two: {
+    name: "the second name here"
+    age: 30
+    hometown: "tha bronx"
+}
+
+people: [.person_one .person_two]

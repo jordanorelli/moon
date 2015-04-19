@@ -201,6 +201,10 @@ func (n *assignmentNode) eval(ctx map[string]interface{}) (interface{}, error) {
 	return nil, nil
 }
 
+func (n *assignmentNode) isHidden() bool {
+	return strings.HasPrefix(n.name, ".")
+}
+
 type stringNode string
 
 func (s *stringNode) Type() nodeType {
@@ -441,8 +445,4 @@ func (v *variableNode) eval(ctx map[string]interface{}) (interface{}, error) {
 		return nil, fmt.Errorf("undefined variable: %s", *v)
 	}
 	return value, nil
-}
-
-func (v *variableNode) isHidden() bool {
-	return strings.HasPrefix(v.name, ".")
 }
