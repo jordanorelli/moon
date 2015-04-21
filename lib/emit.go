@@ -66,6 +66,8 @@ func typeEncoder(t reflect.Type) encodeFn {
 		return encodeString
 	case reflect.Struct:
 		return encodeStruct
+	case reflect.Slice:
+		return encodeSlice
 	default:
 		panic(fmt.Errorf("unhandled type: %v kind: %v", t, t.Kind()))
 	}
@@ -141,4 +143,15 @@ func encodeString(e *encoder, v reflect.Value) {
 		}
 	}
 	e.WriteByte('"')
+}
+
+func encodeSlice(e *encoder, v reflect.Value) {
+	e.WriteByte('[')
+	for i := 0; i < v.Len(); i++ {
+		if i > 0 {
+			e.WriteByte(' ')
+		}
+		e.encodeValue(v.Index(i))
+	}
+	e.WriteByte(']')
 }

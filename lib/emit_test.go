@@ -29,6 +29,10 @@ var valueTests = []struct {
 	{"a string", `"a string"`},
 	{`it's got "quotes"`, `"it's got \"quotes\""`},
 	{person{"jordan", 28}, `{Name: "jordan" Age: 28}`},
+	{[]int{1, 2, 3}, `[1 2 3]`},
+	{[]float32{1.0, 2.2, 3.3}, `[1.0 2.2 3.3]`},
+	{[]float64{1.0, 2.2, 3.3}, `[1.0 2.2 3.3]`},
+	{[]string{"one", "two", "three"}, `["one" "two" "three"]`},
 }
 
 func TestWriteValues(t *testing.T) {
