@@ -2,8 +2,10 @@ package moon
 
 import (
 	"bytes"
+	"fmt"
 	"math"
 	"reflect"
+	"runtime"
 	"strconv"
 )
 
@@ -20,7 +22,20 @@ type encoder struct {
 	scratch [64]byte
 }
 
-func (e *encoder) encode(v interface{}) error {
+func (e *encoder) encode(v interface{}) (err error) {
+	defer func() {
+		r := recover()
+		if r == nil {
+			return
+		}
+		if _, ok := r.(runtime.Error); ok {
+			panic(r)
+		}
+		if s, ok := r.(string); ok {
+			panic(s)
+		}
+		err = r.(error)
+	}()
 	e.encodeValue(reflect.ValueOf(v))
 	return nil
 }
@@ -49,8 +64,10 @@ func typeEncoder(t reflect.Type) encodeFn {
 		return encodeFloat64
 	case reflect.String:
 		return encodeString
+	case reflect.Struct:
+		return encodeStruct
 	default:
-		panic("I don't know what to do here")
+		panic(fmt.Errorf("unhandled type: %v kind: %v", t, t.Kind()))
 	}
 }
 
@@ -82,6 +99,23 @@ func encodeFloat(bits int) encodeFn {
 		b := strconv.AppendFloat(e.scratch[:0], f, 'f', 1, bits)
 		e.Write(b)
 	}
+}
+
+func encodeStruct(e *encoder, v reflect.Value) {
+	t := v.Type()
+	e.WriteByte('{')
+	for i := 0; i < t.NumField(); i++ {
+		f := t.Field(i)
+		e.WriteString(f.Name)
+		e.WriteByte(':')
+		e.WriteByte(' ')
+		fv := v.FieldByName(f.Name)
+		e.encodeValue(fv)
+		if i != t.NumField()-1 {
+			e.WriteByte(' ')
+		}
+	}
+	e.WriteByte('}')
 }
 
 var (

@@ -4,6 +4,11 @@ import (
 	"testing"
 )
 
+type person struct {
+	Name string
+	Age  int
+}
+
 var valueTests = []struct {
 	in  interface{}
 	out string
@@ -23,6 +28,7 @@ var valueTests = []struct {
 	// better than something having things change type.
 	{"a string", `"a string"`},
 	{`it's got "quotes"`, `"it's got \"quotes\""`},
+	{person{"jordan", 28}, `{Name: "jordan" Age: 28}`},
 }
 
 func TestWriteValues(t *testing.T) {
