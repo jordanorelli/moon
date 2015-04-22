@@ -45,12 +45,14 @@ Moon defines the following types:
 - integers: right now this is an int based on Go semantics; it's a 32 bit int
   on 32 bit CPUs, and a 64 bit int on 64 bit CPUs.  These are some integers:
 
-    1  
-    2  
-    -1  
-    -12348  
-    0  
-    +0  
+```
+1  
+2  
+-1  
+-12348  
+0  
++0  
+```
 
 - floats: they're all float64.  These are some floats:
 
