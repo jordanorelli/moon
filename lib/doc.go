@@ -1,6 +1,7 @@
 package moon
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"reflect"
@@ -14,6 +15,24 @@ type Doc struct {
 
 func (d *Doc) MarshalJSON() ([]byte, error) {
 	return json.Marshal(d.items)
+}
+
+func (d *Doc) MarshalMoon() ([]byte, error) {
+	var buf bytes.Buffer
+	for k, v := range d.items {
+		buf.WriteString(k)
+		buf.WriteByte(':')
+		buf.WriteByte(' ')
+		b, err := Encode(v)
+		if err != nil {
+			return nil, err
+		}
+		if _, err := buf.Write(b); err != nil {
+			return nil, err
+		}
+		buf.WriteByte('\n')
+	}
+	return buf.Bytes(), nil
 }
 
 func (d *Doc) Get(path string, dest interface{}) error {

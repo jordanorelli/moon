@@ -9,6 +9,10 @@ import (
 	"strconv"
 )
 
+type Marshaler interface {
+	MarshalMoon() ([]byte, error)
+}
+
 func Encode(v interface{}) ([]byte, error) {
 	e := &encoder{}
 	if err := e.encode(v); err != nil {
@@ -52,7 +56,15 @@ func valueEncoder(v reflect.Value) encodeFn {
 	return typeEncoder(v.Type())
 }
 
+var (
+	marshalerType = reflect.TypeOf(new(Marshaler)).Elem()
+)
+
 func typeEncoder(t reflect.Type) encodeFn {
+	if t.Implements(marshalerType) {
+		return marshalerEncoder
+	}
+
 	switch t.Kind() {
 	case reflect.Bool:
 		return encodeBool
@@ -70,6 +82,8 @@ func typeEncoder(t reflect.Type) encodeFn {
 		return encodeSlice
 	case reflect.Interface:
 		return encodeInterface
+	case reflect.Ptr:
+		return encodePointer
 	case reflect.Map:
 		return encodeMap
 	default:
@@ -186,4 +200,25 @@ func encodeMap(e *encoder, v reflect.Value) {
 		e.encodeValue(elem)
 	}
 	e.WriteByte('}')
+}
+
+func encodePointer(e *encoder, v reflect.Value) {
+	if v.IsNil() {
+		e.WriteString("null")
+		return
+	}
+	e.encodeValue(v.Elem())
+}
+
+func marshalerEncoder(e *encoder, v reflect.Value) {
+	if v.Kind() == reflect.Ptr && v.IsNil() {
+		e.WriteString("null")
+		return
+	}
+	m := v.Interface().(Marshaler)
+	b, err := m.MarshalMoon()
+	if err != nil {
+		panic(err)
+	}
+	e.Write(b)
 }

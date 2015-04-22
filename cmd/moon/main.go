@@ -43,7 +43,9 @@ func to() {
 }
 
 func to_json(n int) {
-	doc, err := moon.Read(input(n))
+	in := input(n)
+	defer in.Close()
+	doc, err := moon.Read(in)
 	if err != nil {
 		bail(1, "input error: %s", err)
 	}
@@ -56,7 +58,10 @@ func to_json(n int) {
 
 func get() {
 	docpath := flag.Arg(1)
-	doc, err := moon.Read(input(2))
+	in := input(2)
+	defer in.Close()
+
+	doc, err := moon.Read(in)
 	if err != nil {
 		bail(1, "input error: %s", err)
 	}
@@ -67,6 +72,21 @@ func get() {
 	b, err := moon.Encode(v)
 	if err != nil {
 		bail(1, "error encoding value: %s", err)
+	}
+	os.Stdout.Write(b)
+}
+
+func eval() {
+	in := input(1)
+	defer in.Close()
+
+	doc, err := moon.Read(in)
+	if err != nil {
+		bail(1, "input error: %s", err)
+	}
+	b, err := moon.Encode(doc)
+	if err != nil {
+		bail(1, "output error: %s", err)
 	}
 	os.Stdout.Write(b)
 }
@@ -91,8 +111,10 @@ func main() {
 		to()
 	case "get":
 		get()
+	case "eval":
+		eval()
 	case "":
-		bail(1, "must specify an action.\nvalid actions: check to get")
+		bail(1, "must specify an action.\nvalid actions: check to get eval")
 	default:
 		bail(1, "no such action:%s", flag.Arg(0))
 	}
