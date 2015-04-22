@@ -64,7 +64,11 @@ func get() {
 	if err := doc.Get(docpath, &v); err != nil {
 		bail(1, "error reading value at path %s: %s", docpath, err)
 	}
-	fmt.Println(v)
+	b, err := moon.Encode(v)
+	if err != nil {
+		bail(1, "error encoding value: %s", err)
+	}
+	os.Stdout.Write(b)
 }
 
 func bail(status int, t string, args ...interface{}) {

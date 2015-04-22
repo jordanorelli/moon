@@ -68,6 +68,10 @@ func typeEncoder(t reflect.Type) encodeFn {
 		return encodeStruct
 	case reflect.Slice:
 		return encodeSlice
+	case reflect.Interface:
+		return encodeInterface
+	case reflect.Map:
+		return encodeMap
 	default:
 		panic(fmt.Errorf("unhandled type: %v kind: %v", t, t.Kind()))
 	}
@@ -98,7 +102,7 @@ func encodeFloat(bits int) encodeFn {
 		if math.IsInf(f, 0) || math.IsNaN(f) {
 			panic("that value is bad") // TODO: not this
 		}
-		b := strconv.AppendFloat(e.scratch[:0], f, 'f', 1, bits)
+		b := strconv.AppendFloat(e.scratch[:0], f, 'g', -1, bits)
 		e.Write(b)
 	}
 }
@@ -154,4 +158,32 @@ func encodeSlice(e *encoder, v reflect.Value) {
 		e.encodeValue(v.Index(i))
 	}
 	e.WriteByte(']')
+}
+
+func encodeInterface(e *encoder, v reflect.Value) {
+	if v.IsNil() {
+		e.WriteString("null")
+		return
+	}
+	e.encodeValue(v.Elem())
+}
+
+func encodeMap(e *encoder, v reflect.Value) {
+	t := v.Type()
+	if t.Key().Kind() != reflect.String {
+		panic(fmt.Errorf("unsupported map key type: %v", t.Key().Kind()))
+	}
+	keys := v.MapKeys()
+	e.WriteByte('{')
+	for i, key := range keys {
+		if i > 0 {
+			e.WriteByte(' ')
+		}
+		e.WriteString(key.String()) // TODO: escape this?
+		e.WriteByte(':')
+		e.WriteByte(' ')
+		elem := v.MapIndex(key)
+		e.encodeValue(elem)
+	}
+	e.WriteByte('}')
 }
