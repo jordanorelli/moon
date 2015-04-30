@@ -1,3 +1,23 @@
+/*
+The Moon configuration language.
+
+Purpose
+
+The Moon configuration language is intended to be an alternative to json as
+a configuration language for Go projects.  Moon has the following explicit
+design goals:
+
+  - to be reasonable for a human to write
+  - to be reasonable for a human to read
+  - to be reasonable for a machine to generate
+  - to be reasonable for a programmer to parse
+  - to accomodate documents both large and small
+
+That is, none of these goals is heralded as being the single most important
+goal, and Moon makes no claim at being the best format for any of these
+individual goals, but it does attempt to consider each of them to at least
+some degree.
+*/
 package moon
 
 import (
