@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"os"
 	"strings"
 )
 
@@ -40,6 +41,16 @@ func ReadString(source string) (*Doc, error) {
 // method; like ReadString, it simply creates a buffer and calls moon.Read
 func ReadBytes(b []byte) (*Doc, error) {
 	return Read(bytes.NewBuffer(b))
+}
+
+func ReadFile(path string) (*Doc, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	return Read(f)
 }
 
 func parse(r io.Reader) (node, error) {

@@ -29,6 +29,7 @@ import (
 	"strings"
 )
 
+// Doc represents a Moon document.
 type Doc struct {
 	items map[string]interface{}
 }
