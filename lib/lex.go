@@ -128,6 +128,22 @@ func (l *lexer) unread(r rune) {
 }
 
 func (l *lexer) emit(t tokenType) {
+	switch t {
+	case t_variable:
+		if !l.bufHasSpaces() {
+			break
+		}
+		msg := fmt.Sprintf(`invalid var name: "%s" (var names cannot contain spaces)`, string(l.buf))
+		l.out <- token{t_error, msg}
+		return
+	case t_name:
+		if !l.bufHasSpaces() {
+			break
+		}
+		msg := fmt.Sprintf(`invalid name: "%s" (names cannot contain spaces)`, string(l.buf))
+		l.out <- token{t_error, msg}
+		return
+	}
 	l.out <- token{t, string(l.buf)}
 	l.buf = l.buf[0:0]
 }
@@ -149,6 +165,15 @@ func (l *lexer) acceptRun(chars string) bool {
 		none = false
 	}
 	return !none
+}
+
+func (l *lexer) bufHasSpaces() bool {
+	for _, r := range l.buf {
+		if unicode.IsSpace(r) {
+			return true
+		}
+	}
+	return false
 }
 
 func lexString(in string) chan token {
@@ -288,59 +313,62 @@ func lexQuotedString(delim rune) stateFn {
 
 func lexNameOrString(l *lexer) stateFn {
 	r := l.next()
-	switch r {
-	case '\n', ';':
+	switch {
+	case r == '\n', r == ';':
 		l.emit(t_string)
 		return lexRoot
-	case ':':
+	case r == ':':
 		l.emit(t_name)
 		l.keep(r)
 		l.emit(t_object_separator)
 		return lexRoot
-	case '\\':
+	case isSpecial(r):
+		l.emit(t_string)
+		l.unread(r)
+		return lexRoot
+	case r == '\\':
 		rr := l.next()
 		if rr == eof {
 			return lexErrorf("unexpected eof in string or name")
 		}
 		l.keep(rr)
 		return lexNameOrString
-	case '#':
-		return lexComment
-	case eof:
+	case r == eof:
 		l.emit(t_string)
 		return nil
-	default:
+	case unicode.IsGraphic(r):
 		l.keep(r)
 		return lexNameOrString
+	default:
+		return lexErrorf("unexpected rune in string or name: %c", r)
 	}
 }
 
 func lexVariable(l *lexer) stateFn {
 	r := l.next()
-	switch r {
-	case '\n', ';':
+	switch {
+	case unicode.IsSpace(r), r == ';':
 		l.emit(t_variable)
 		return lexRoot
-	case ':':
-		l.emit(t_variable)
-		l.keep(r)
-		l.emit(t_object_separator)
-		return lexRoot
-	case '\\':
+	case r == '\\':
 		rr := l.next()
 		if rr == eof {
 			return lexErrorf("unexpected eof in variable name")
 		}
 		l.keep(rr)
 		return lexVariable
-	case '#':
-		return lexComment
-	case eof:
+	case isSpecial(r):
+		l.emit(t_variable)
+		l.unread(r)
+		return lexRoot
+	case r == eof:
 		l.emit(t_variable)
 		return nil
-	default:
+	case unicode.IsGraphic(r):
 		l.keep(r)
 		return lexVariable
+	default:
+		return lexErrorf("unexpected rune in var name: %c", r)
 	}
 }
 
@@ -378,4 +406,8 @@ func lexNumber(l *lexer) stateFn {
 
 func isAlphaNumeric(r rune) bool {
 	return r == '_' || unicode.IsLetter(r) || unicode.IsDigit(r)
+}
+
+func isSpecial(r rune) bool {
+	return strings.ContainsRune("[]{}:;#", r)
 }

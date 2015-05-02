@@ -11,9 +11,3 @@ root:
     value:
       string:
         this is a bare string
-  assign:
-    name:
-      name with space
-    value:
-      string:
-        that name has spaces in it, and you know what? that's ok!

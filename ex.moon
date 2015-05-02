@@ -9,25 +9,25 @@
 
 # the whole document is implicitly a namespace, so you can set key value pairs
 # at the top level.
-first_name: "jordan"
-last_name: "orelli"
+first_name: jordan
+last_name: orelli
 
 # lists of things should be supported
 items: [
-    "one"
+    one
     2
     3.4
-    ["five" 6 7.8]
+    [five; 6 7.8]
 ]
 
 # objects should be supported
-hash: {key: "value" other_key: "other_value"}
+hash: {key: value; other_key: other_value}
 
 other_hash: {
-    key_1: "one"
+    key_1: one
     key_2: 2
     key_3: 3.4
-    key_4: ["five" 6 7.8]
+    key_4: [five; 6 7.8]
 }
 
 # we may reference an item that was defined earlier using a sigil
@@ -37,19 +37,19 @@ repeat_hash: @hash
 # intermediate values internal to the config file; they are *not* visible to
 # the host program.  This is generally useful for composing larger, more
 # complicated things.
-@hidden_item: "it has a value"
+@hidden_item: it has a value
 visible_item: @hidden_item
 
 @person_one: {
-    name: "the first name here"
+    name: the first name here
     age: 28
-    hometown: "crooklyn"
+    hometown: crooklyn
 }
 
 @person_two: {
-    name: "the second name here"
+    name: the second name here
     age: 30
-    hometown: "tha bronx"
+    hometown: tha bronx
 }
 
 people: [@person_one @person_two]

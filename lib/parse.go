@@ -19,16 +19,11 @@ func Read(r io.Reader) (*Doc, error) {
 	if err != nil {
 		return nil, err
 	}
-	ctx := make(map[string]interface{})
+	ctx := newContext()
 	if _, err := tree.eval(ctx); err != nil {
 		return nil, fmt.Errorf("eval error: %s\n", err)
 	}
-	for name, _ := range ctx {
-		if strings.HasPrefix(name, ".") {
-			delete(ctx, name)
-		}
-	}
-	return &Doc{items: ctx}, nil
+	return &Doc{items: ctx.public}, nil
 }
 
 // Reads a moon document from a string. This is purely a convenience method;

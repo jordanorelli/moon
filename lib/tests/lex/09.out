@@ -1,0 +1,5 @@
+{t_name people}
+{t_object_separator :}
+{t_list_start [}
+{t_variable person_one}
+{t_list_end ]}
