@@ -26,7 +26,7 @@ func runLexTest(t *testing.T, basepath, inpath, outpath string) {
 	}
 
 	r_inpath := filepath.Base(inpath)
-	n, err := strconv.ParseInt(strings.TrimSuffix(r_inpath, ".in"), 0, 64)
+	n, err := strconv.ParseInt(strings.TrimSuffix(r_inpath, ".in"), 10, 64)
 	if err != nil {
 		t.Errorf("unable to get test number for path %s: %s", inpath, err)
 		return
