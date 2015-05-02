@@ -1,0 +1,12 @@
+{t_name key_one}
+{t_object_separator :}
+{t_string this is the first value}
+{t_name key_two}
+{t_object_separator :}
+{t_variable key_one}
+{t_variable variable_key}
+{t_object_separator :}
+{t_string that key is not exported, it's only valid as a variable inside of moon itself}
+{t_name key_three}
+{t_object_separator :}
+{t_variable variable_key}

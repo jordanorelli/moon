@@ -39,6 +39,8 @@ func (t tokenType) String() string {
 		return "t_real_number"
 	case t_imaginary_number:
 		return "t_imaginary_number"
+	case t_variable:
+		return "t_variable"
 	default:
 		panic(fmt.Sprintf("unknown token type: %v", t))
 	}
@@ -57,6 +59,7 @@ const (
 	t_object_separator                  // :
 	t_real_number                       // a number
 	t_imaginary_number                  // an imaginary number
+	t_variable                          // e.g. @var_name, a variable name.
 )
 
 type stateFn func(*lexer) stateFn
@@ -217,6 +220,8 @@ func lexRoot(l *lexer) stateFn {
 	case r == '.':
 		l.keep(r)
 		return lexAfterPeriod
+	case r == '@':
+		return lexVariable
 	case strings.IndexRune("+-0123456789", r) >= 0:
 		l.unread(r)
 		return lexNumber
@@ -283,27 +288,59 @@ func lexQuotedString(delim rune) stateFn {
 
 func lexNameOrString(l *lexer) stateFn {
 	r := l.next()
-	switch {
-	case r == '\n', r == ';':
+	switch r {
+	case '\n', ';':
 		l.emit(t_string)
 		return lexRoot
-	case r == ':':
+	case ':':
 		l.emit(t_name)
 		l.keep(r)
 		l.emit(t_object_separator)
 		return lexRoot
-	case r == '\\':
+	case '\\':
 		rr := l.next()
 		if rr == eof {
 			return lexErrorf("unexpected eof in string or name")
 		}
 		l.keep(rr)
 		return lexNameOrString
-	case r == '#':
+	case '#':
 		return lexComment
+	case eof:
+		l.emit(t_string)
+		return nil
 	default:
 		l.keep(r)
 		return lexNameOrString
+	}
+}
+
+func lexVariable(l *lexer) stateFn {
+	r := l.next()
+	switch r {
+	case '\n', ';':
+		l.emit(t_variable)
+		return lexRoot
+	case ':':
+		l.emit(t_variable)
+		l.keep(r)
+		l.emit(t_object_separator)
+		return lexRoot
+	case '\\':
+		rr := l.next()
+		if rr == eof {
+			return lexErrorf("unexpected eof in variable name")
+		}
+		l.keep(rr)
+		return lexVariable
+	case '#':
+		return lexComment
+	case eof:
+		l.emit(t_variable)
+		return nil
+	default:
+		l.keep(r)
+		return lexVariable
 	}
 }
 

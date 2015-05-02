@@ -1,0 +1,8 @@
+key_one: this is the first value
+
+key_two: @key_one
+
+@variable_key: that key is not exported, it's only valid as a variable inside of moon itself
+
+key_three: @variable_key
+
