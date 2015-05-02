@@ -152,7 +152,7 @@ func (p *parser) parseValue() (node, error) {
 				return nil, err
 			}
 			return n, nil
-		case t_name:
+		case t_variable:
 			n := new(variableNode)
 			if err := n.parse(p); err != nil {
 				return nil, err

@@ -1,0 +1,15 @@
+# simple keys and values
+
+key: 1 # comments are stripped
+key_2: 2
+key_3: -1
+
+# basically the stripping of comments is all we care about
+key_4: 0
+key_5: +0
+
+key_6: this is a string
+key_7: "this is a quoted string"
+
+key_8: [1 2 3]
+

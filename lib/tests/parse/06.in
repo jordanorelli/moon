@@ -1,0 +1,4 @@
+a_key: this is a value
+another_key: @a_key
+@var_key: this shouldn't ever be exported outside of the moon interpreter
+public_key: @var_key

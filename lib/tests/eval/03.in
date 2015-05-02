@@ -1,0 +1,5 @@
+# now we test that variables actually work
+
+key: this is a literal value
+another_key: @key
+

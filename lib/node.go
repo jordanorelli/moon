@@ -55,7 +55,7 @@ func (n *rootNode) parse(p *parser) error {
 			return nil
 		case t_comment:
 			n.addChild(&commentNode{t.s})
-		case t_name:
+		case t_name, t_variable:
 			nn := &assignmentNode{name: t.s}
 			if err := nn.parse(p); err != nil {
 				return err
@@ -426,7 +426,7 @@ func (v *variableNode) Type() nodeType {
 
 func (v *variableNode) parse(p *parser) error {
 	t := p.next()
-	if t.t != t_name {
+	if t.t != t_variable {
 		return fmt.Errorf("unexpected %s token when parsing variable", t.t)
 	}
 	v.name = t.s

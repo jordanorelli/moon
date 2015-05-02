@@ -1,0 +1,25 @@
+root:
+  assign:
+    name:
+      a_key
+    value:
+      string:
+        this is a value
+  assign:
+    name:
+      another_key
+    value:
+      variable:
+        a_key
+  assign:
+    name:
+      var_key
+    value:
+      string:
+        this shouldn't ever be exported outside of the moon interpreter
+  assign:
+    name:
+      public_key
+    value:
+      variable:
+        var_key
