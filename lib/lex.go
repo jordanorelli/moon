@@ -194,7 +194,7 @@ func lexRoot(l *lexer) stateFn {
 		l.emit(t_object_separator)
 		return lexRoot
 	case r == '"', r == '`':
-		return lexStringLiteral(r)
+		return lexQuotedString(r)
 	case r == '#':
 		return lexComment
 	case r == '[':
@@ -264,7 +264,7 @@ func lexComment(l *lexer) stateFn {
 	}
 }
 
-func lexStringLiteral(delim rune) stateFn {
+func lexQuotedString(delim rune) stateFn {
 	return func(l *lexer) stateFn {
 		switch r := l.next(); r {
 		case delim:
@@ -276,13 +276,13 @@ func lexStringLiteral(delim rune) stateFn {
 				return lexErrorf("unexpected eof in string literal")
 			default:
 				l.keep(r)
-				return lexStringLiteral(delim)
+				return lexQuotedString(delim)
 			}
 		case eof:
 			return lexErrorf("unexpected eof in string literal")
 		default:
 			l.keep(r)
-			return lexStringLiteral(delim)
+			return lexQuotedString(delim)
 		}
 	}
 }
