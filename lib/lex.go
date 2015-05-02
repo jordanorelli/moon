@@ -23,8 +23,6 @@ func (t tokenType) String() string {
 		return "t_string"
 	case t_name:
 		return "t_name"
-	case t_type:
-		return "t_type"
 	case t_comment:
 		return "t_comment"
 	case t_list_start:
@@ -51,7 +49,6 @@ const (
 	t_eof                               // end of file token
 	t_string                            // a string literal
 	t_name                              // a name
-	t_type                              // a type
 	t_comment                           // a comment
 	t_list_start                        // [
 	t_list_end                          // ]
@@ -225,12 +222,9 @@ func lexRoot(l *lexer) stateFn {
 		return lexNumber
 	case unicode.IsSpace(r):
 		return lexRoot
-	case unicode.IsLower(r):
+	case unicode.IsLower(r), unicode.IsUpper(r):
 		l.keep(r)
 		return lexName
-	case unicode.IsUpper(r):
-		l.keep(r)
-		return lexType
 	default:
 		return lexErrorf("unexpected rune in lexRoot: %c", r)
 	}
@@ -298,22 +292,6 @@ func lexName(l *lexer) stateFn {
 		return nil
 	default:
 		l.emit(t_name)
-		l.unread(r)
-		return lexRoot
-	}
-}
-
-func lexType(l *lexer) stateFn {
-	r := l.next()
-	switch {
-	case unicode.IsLetter(r), unicode.IsDigit(r), r == '_':
-		l.keep(r)
-		return lexType
-	case r == eof:
-		l.emit(t_type)
-		return nil
-	default:
-		l.emit(t_type)
 		l.unread(r)
 		return lexRoot
 	}
