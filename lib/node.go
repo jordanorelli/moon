@@ -26,11 +26,13 @@ const (
 
 var indent = "  "
 
+type context map[string]interface{}
+
 type node interface {
 	Type() nodeType
 	parse(*parser) error
 	pretty(io.Writer, string) error
-	eval(map[string]interface{}) (interface{}, error)
+	eval(context) (interface{}, error)
 }
 
 type rootNode struct {
@@ -97,7 +99,7 @@ func (n *rootNode) pretty(w io.Writer, prefix string) error {
 	return nil
 }
 
-func (n *rootNode) eval(ctx map[string]interface{}) (interface{}, error) {
+func (n *rootNode) eval(ctx context) (interface{}, error) {
 	for _, child := range n.children {
 		if _, err := child.eval(ctx); err != nil {
 			return nil, err
@@ -141,7 +143,7 @@ func (n *commentNode) pretty(w io.Writer, prefix string) error {
 	return nil
 }
 
-func (n *commentNode) eval(ctx map[string]interface{}) (interface{}, error) {
+func (n *commentNode) eval(ctx context) (interface{}, error) {
 	return nil, nil
 }
 
@@ -189,7 +191,7 @@ func (n *assignmentNode) pretty(w io.Writer, prefix string) error {
 	return nil
 }
 
-func (n *assignmentNode) eval(ctx map[string]interface{}) (interface{}, error) {
+func (n *assignmentNode) eval(ctx context) (interface{}, error) {
 	if _, ok := ctx[n.name]; ok {
 		return nil, fmt.Errorf("invalid re-declaration: %s", n.name)
 	}
@@ -226,7 +228,7 @@ func (s *stringNode) pretty(w io.Writer, prefix string) error {
 	return err
 }
 
-func (s *stringNode) eval(ctx map[string]interface{}) (interface{}, error) {
+func (s *stringNode) eval(ctx context) (interface{}, error) {
 	return string(*s), nil
 }
 
@@ -290,7 +292,7 @@ func (n *numberNode) pretty(w io.Writer, prefix string) error {
 	return nil
 }
 
-func (n *numberNode) eval(ctx map[string]interface{}) (interface{}, error) {
+func (n *numberNode) eval(ctx context) (interface{}, error) {
 	switch n.t {
 	case num_int:
 		return n.i, nil
@@ -340,7 +342,7 @@ func (l *listNode) pretty(w io.Writer, prefix string) error {
 	return nil
 }
 
-func (l *listNode) eval(ctx map[string]interface{}) (interface{}, error) {
+func (l *listNode) eval(ctx context) (interface{}, error) {
 	out := make([]interface{}, 0, len(*l))
 	for _, n := range *l {
 		v, err := n.eval(ctx)
@@ -404,7 +406,7 @@ func (o *objectNode) pretty(w io.Writer, prefix string) error {
 	return nil
 }
 
-func (o *objectNode) eval(ctx map[string]interface{}) (interface{}, error) {
+func (o *objectNode) eval(ctx context) (interface{}, error) {
 	out := make(map[string]interface{}, len(*o))
 	for name, node := range *o {
 		v, err := node.eval(ctx)
@@ -439,7 +441,7 @@ func (v *variableNode) pretty(w io.Writer, prefix string) error {
 	return nil
 }
 
-func (v *variableNode) eval(ctx map[string]interface{}) (interface{}, error) {
+func (v *variableNode) eval(ctx context) (interface{}, error) {
 	value, ok := ctx[v.name]
 	if !ok {
 		return nil, fmt.Errorf("undefined variable: %s", *v)
