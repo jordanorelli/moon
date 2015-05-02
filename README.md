@@ -105,12 +105,18 @@ but semicolons \;, colons \:, parens \( and \), brackets \[ and \] and braces \{
   These are some objects:
 
 ```
+# key-value pairs are delimited by spaces; no commas are required
 {name: "jordan" age: 28}
+
 {
     one: 1
     two: two is also a number
     pi: 3.14
 }
+
+# you may use a bare string as a value, but a semicolon is required to
+# terminate the bare string
+{name: jordan; age: 28}
 ```
 
 - lists: they're `[]interface{}` values.  They're not typed, and they can be
