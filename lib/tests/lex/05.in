@@ -1,8 +1,10 @@
 
-errant_name
+this whole line is one string value, y'all!
 
 no_value:
 
-key: var_name
+key: a bare string is here
 
 key: "string"
+
+one: the first string; two: the second string

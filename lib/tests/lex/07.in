@@ -1,8 +1,8 @@
 empty_object: {}
 
 crazy_object: {
-    key: variable
-    key_two: "string here"
+    key: bare string here
+    key_two: "quoted string here"
     key_three: [1 2 3]
     key_four: {
         nested_one: "alright"

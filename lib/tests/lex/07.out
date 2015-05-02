@@ -7,10 +7,10 @@
 {t_object_start {}
 {t_name key}
 {t_object_separator :}
-{t_name variable}
+{t_string bare string here}
 {t_name key_two}
 {t_object_separator :}
-{t_string string here}
+{t_string quoted string here}
 {t_name key_three}
 {t_object_separator :}
 {t_list_start [}

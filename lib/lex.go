@@ -224,7 +224,7 @@ func lexRoot(l *lexer) stateFn {
 		return lexRoot
 	case unicode.IsLower(r), unicode.IsUpper(r):
 		l.keep(r)
-		return lexName
+		return lexNameOrString
 	default:
 		return lexErrorf("unexpected rune in lexRoot: %c", r)
 	}
@@ -238,7 +238,7 @@ func lexAfterPeriod(l *lexer) stateFn {
 		return lexNumber
 	case unicode.IsLower(r):
 		l.keep(r)
-		return lexName
+		return lexNameOrString
 	default:
 		return lexErrorf("unexpected rune after period: %c", r)
 	}
@@ -281,19 +281,29 @@ func lexQuotedString(delim rune) stateFn {
 	}
 }
 
-func lexName(l *lexer) stateFn {
+func lexNameOrString(l *lexer) stateFn {
 	r := l.next()
 	switch {
-	case unicode.IsLetter(r), unicode.IsDigit(r), r == '_':
-		l.keep(r)
-		return lexName
-	case r == eof:
-		l.emit(t_name)
-		return nil
-	default:
-		l.emit(t_name)
-		l.unread(r)
+	case r == '\n', r == ';':
+		l.emit(t_string)
 		return lexRoot
+	case r == ':':
+		l.emit(t_name)
+		l.keep(r)
+		l.emit(t_object_separator)
+		return lexRoot
+	case r == '\\':
+		rr := l.next()
+		if rr == eof {
+			return lexErrorf("unexpected eof in string or name")
+		}
+		l.keep(rr)
+		return lexNameOrString
+	case r == '#':
+		return lexComment
+	default:
+		l.keep(r)
+		return lexNameOrString
 	}
 }
 

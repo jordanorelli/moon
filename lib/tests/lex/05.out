@@ -1,9 +1,15 @@
-{t_name errant_name}
+{t_string this whole line is one string value, y'all!}
 {t_name no_value}
 {t_object_separator :}
 {t_name key}
 {t_object_separator :}
-{t_name var_name}
+{t_string a bare string is here}
 {t_name key}
 {t_object_separator :}
 {t_string string}
+{t_name one}
+{t_object_separator :}
+{t_string the first string}
+{t_name two}
+{t_object_separator :}
+{t_string the second string}

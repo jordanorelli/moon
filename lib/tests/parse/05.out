@@ -1,13 +1,19 @@
 root:
   assign:
     name:
-      an_item
+      quoted_string
     value:
       string:
-        this is the value of the item
+        this is a quoted string
   assign:
     name:
-      a_variable
+      bare_string
     value:
-      variable:
-        an_item
+      string:
+        this is a bare string
+  assign:
+    name:
+      name with space
+    value:
+      string:
+        that name has spaces in it, and you know what? that's ok!
