@@ -14,7 +14,7 @@ The following is taken to be the contents of a file named ex.moon:
   # at the top level.
   first_name: "jordan"
   last_name: "orelli"
-  
+
   # lists of things should be supported
   items: [
       "one"
@@ -22,20 +22,20 @@ The following is taken to be the contents of a file named ex.moon:
       3.4
       ["five" 6 7.8]
   ]
-  
+
   # objects should be supported
   hash: {key: "value" other_key: "other_value"}
-  
+
   other_hash: {
       key_1: "one"
       key_2: 2
       key_3: 3.4
       key_4: ["five" 6 7.8]
   }
-  
+
   # we may reference an item that was defined earlier
   repeat_hash: hash
-  
+
   # items can be hidden.  i.e., they're only valid in the parse and eval stage as
   # intermediate values internal to the config file; they are *not* visible to
   # the host program.  This is generally useful for composing larger, more
@@ -114,7 +114,7 @@ file to be searched.  Given the moon file ex.moon:
   "jordan"
 
   > moon get visible_item ex.moon
-  "it has a value" 
+  "it has a value"
 
   > moon get people ex.moon
   [{hometown: "crooklyn" name: "the first name here" age: 28} {name: "the second name here" age: 30 hometown: "tha bronx"}]

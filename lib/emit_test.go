@@ -20,18 +20,14 @@ var valueTests = []struct {
 	{1, "1"},
 	{12345, "12345"},
 	{.1, "0.1"},
-	{1.0, "1.0"},
-	{1.0e9, "1000000000.0"},
-	// this is kinda gross, but it's the only way I've figured out how to
-	// prevent 1.0 printing out as 1 and thus having its type changed from
-	// float to int. Sometimes having obnoxious string representations is
-	// better than something having things change type.
+	{1.0, "1"}, // god dammit
+	{1.0e9, "1e+09"},
 	{"a string", `"a string"`},
 	{`it's got "quotes"`, `"it's got \"quotes\""`},
 	{person{"jordan", 28}, `{Name: "jordan" Age: 28}`},
 	{[]int{1, 2, 3}, `[1 2 3]`},
-	{[]float32{1.0, 2.2, 3.3}, `[1.0 2.2 3.3]`},
-	{[]float64{1.0, 2.2, 3.3}, `[1.0 2.2 3.3]`},
+	{[]float32{1.0, 2.2, 3.3}, `[1 2.2 3.3]`},
+	{[]float64{1.0, 2.2, 3.3}, `[1 2.2 3.3]`},
 	{[]string{"one", "two", "three"}, `["one" "two" "three"]`},
 	{
 		map[string]int{"one": 1, "two": 2, "three": 3},
@@ -43,7 +39,7 @@ var valueTests = []struct {
 			"two": 2.0,
 			"pi":  3.14,
 		},
-		`{one: 1 two: 2.0 pi: 3.14}`,
+		`{one: 1 two: 2 pi: 3.14}`,
 	},
 }
 
