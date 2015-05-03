@@ -10,6 +10,15 @@ import (
 
 const ()
 
+var nodes = map[tokenType]func(p *parser) node{
+	t_string:       func(p *parser) node { return new(stringNode) },
+	t_real_number:  func(p *parser) node { return new(numberNode) },
+	t_list_start:   func(p *parser) node { p.next(); return &listNode{} },
+	t_object_start: func(p *parser) node { p.next(); return &objectNode{} },
+	t_variable:     func(p *parser) node { return new(variableNode) },
+	t_bool:         func(p *parser) node { return new(boolNode) },
+}
+
 // Reads a moon document from a given io.Reader. The io.Reader is advanced to
 // EOF. The reader is not closed after reading, since it's an io.Reader and not
 // an io.ReadCloser. In the event of error, the state that the source reader
@@ -121,46 +130,16 @@ func (p *parser) parseValue() (node, error) {
 			return nil, fmt.Errorf("parse error: saw lex error when looking for value: %v", t.s)
 		case t_eof:
 			return nil, fmt.Errorf("parse error: unexpected eof when looking for value")
-		case t_string:
-			n := new(stringNode)
-			if err := n.parse(p); err != nil {
-				return nil, err
-			}
-			return n, nil
-		case t_real_number:
-			n := new(numberNode)
-			if err := n.parse(p); err != nil {
-				return nil, err
-			}
-			return n, nil
-		case t_list_start:
-			p.next()
-			n := new(listNode)
-			if err := n.parse(p); err != nil {
-				return nil, err
-			}
-			return n, nil
-		case t_object_start:
-			p.next()
-			n := &objectNode{}
-			if err := n.parse(p); err != nil {
-				return nil, err
-			}
-			return n, nil
-		case t_variable:
-			n := new(variableNode)
-			if err := n.parse(p); err != nil {
-				return nil, err
-			}
-			return n, nil
-		case t_bool:
-			n := new(boolNode)
-			if err := n.parse(p); err != nil {
-				return nil, err
-			}
-			return n, nil
-		default:
+		}
+
+		fn, ok := nodes[t.t]
+		if !ok {
 			return nil, fmt.Errorf("parse error: unexpected %v token while looking for value", t.t)
 		}
+		n := fn(p)
+		if err := n.parse(p); err != nil {
+			return nil, err
+		}
+		return n, nil
 	}
 }
