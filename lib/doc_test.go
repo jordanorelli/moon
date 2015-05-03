@@ -41,6 +41,7 @@ func TestFill(t *testing.T) {
 
 	if err := doc.Fill(&dest); err != nil {
 		t.Error(err)
+		return
 	}
 
 	if dest.FirstName != "jordan" {

@@ -81,15 +81,8 @@ func (d *Doc) Get(path string, dest interface{}) error {
 
 	dv := reflect.ValueOf(dest)
 	dve := dv.Elem()
-	return setValue(dve, reflect.ValueOf(v))
-}
-
-func setValue(dest, src reflect.Value) error {
-	if dest.Type() == src.Type() {
-		dest.Set(src)
-		return nil
-	}
-	return fmt.Errorf("src and destination are not of same type. src type: %s, dest type: %s", src.Type().Name(), dest.Type().Name())
+	dve.Set(reflect.ValueOf(v))
+	return nil
 }
 
 // Fill takes the raw values from the moon document and assigns them to the
@@ -101,45 +94,25 @@ func (d *Doc) Fill(dest interface{}) error {
 		return fmt.Errorf("destination is of type %v; a pointer type is required", dt)
 	}
 
+	reqs, err := requirements(dest)
+	if err != nil {
+		return fmt.Errorf("unable to gather requirements: %s", err)
+	}
+
 	dv := reflect.ValueOf(dest).Elem()
-
-	n := dv.NumField()
-	for i := 0; i < n; i++ {
-		field, fv := dv.Type().Field(i), dv.Field(i)
-
-		tag := field.Tag
-		fopts, err := ReadString(string(tag))
-		if err != nil {
-			return fmt.Errorf("unable to parse options for type %s, field %s: %s",
-				dv.Type().Name(), field.Name, err)
-		}
-
-		var fname string
-		if err := fopts.Get("name", &fname); err != nil {
-			if _, ok := err.(NoValue); !ok {
-				return err
-			}
-		}
-
-		var frequired bool
-		if err := fopts.Get("required", &frequired); err != nil {
-			if _, ok := err.(NoValue); !ok {
-				return err
-			}
-		}
-
-		fdefault := fopts.items["default"]
-
-		v, ok := d.items[fname]
-		if !ok {
-			if frequired {
+	for fname, req := range reqs {
+		fv := dv.FieldByName(fname)
+		v, ok := d.items[req.name]
+		if ok {
+			fv.Set(reflect.ValueOf(v))
+		} else {
+			if req.required {
 				return fmt.Errorf("required field missing: %s", fname)
-			} else {
-				fv.Set(reflect.ValueOf(fdefault))
-				continue
+			}
+			if req.d_fault != nil {
+				fv.Set(reflect.ValueOf(req.d_fault))
 			}
 		}
-		fv.Set(reflect.ValueOf(v))
 	}
 	return nil
 }
