@@ -13,7 +13,6 @@ type req struct {
 	d_fault  interface{} // default value for when the option is missing
 	short    string      // short flag on the command line
 	long     string      // long flag on the command line
-	flag     bool        // whether or not the variable is a flag.
 	t        reflect.Type
 }
 
@@ -22,14 +21,13 @@ func (r req) validate() error {
 		return fmt.Errorf("invalid requirement: requirement must have a name")
 	}
 
-	if r.required && r.flag {
-		return fmt.Errorf("invalid requirement %s: a flag cannot be required", r.name)
+	if r.t.Kind() == reflect.Bool && r.required {
+		return fmt.Errorf("invalid requirement: a boolean cannot be required")
 	}
 
 	if r.required && r.d_fault != nil {
 		return fmt.Errorf("invalid requirement %s: a required value cannot have a default", r.name)
 	}
-
 	return nil
 }
 
@@ -55,7 +53,6 @@ func field2req(field reflect.StructField) (*req, error) {
 		"default":  doc.Get("default", &req.d_fault),
 		"short":    doc.Get("short", &req.short),
 		"long":     doc.Get("long", &req.long),
-		"flag":     doc.Get("flag", &req.flag),
 	}
 
 	for fname, err := range errors {
