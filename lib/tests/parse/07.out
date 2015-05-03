@@ -1,0 +1,25 @@
+root:
+  assign:
+    name:
+      b_t
+    value:
+      bool:
+        true
+  assign:
+    name:
+      b_f
+    value:
+      bool:
+        false
+  assign:
+    name:
+      s_t
+    value:
+      string:
+        true
+  assign:
+    name:
+      s_f
+    value:
+      string:
+        false

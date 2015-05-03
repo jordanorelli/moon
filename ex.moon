@@ -12,6 +12,15 @@
 first_name: jordan
 last_name: orelli
 
+# the bare strings true and false are boolean values
+bool_true: true
+bool_false: false
+
+# the quoted strings "true" and "false" are string values.  In the unlikely
+# event you need literal true and false strings, quote them.
+string_true: "true"
+string_false: "false"
+
 # lists of things should be supported
 items: [
     one

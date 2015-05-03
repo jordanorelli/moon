@@ -89,28 +89,7 @@ func setValue(dest, src reflect.Value) error {
 		dest.Set(src)
 		return nil
 	}
-	switch dest.Kind() {
-	case reflect.Bool:
-		setBoolValue(dest, src)
-		return nil
-	default:
-		return fmt.Errorf("src and destination are not of same type. src type: %s, dest type: %s", src.Type().Name(), dest.Type().Name())
-	}
-}
-
-func setBoolValue(dest, src reflect.Value) error {
-	switch src.Kind() {
-	case reflect.String:
-		s := src.String()
-		if s == "false" { // lol
-			dest.Set(reflect.ValueOf(false))
-			return nil
-		}
-		dest.Set(reflect.ValueOf(true))
-		return nil
-	default:
-		return fmt.Errorf("dunno how to set a bool with that damned value")
-	}
+	return fmt.Errorf("src and destination are not of same type. src type: %s, dest type: %s", src.Type().Name(), dest.Type().Name())
 }
 
 // Fill takes the raw values from the moon document and assigns them to the
@@ -165,6 +144,8 @@ func (d *Doc) Fill(dest interface{}) error {
 	return nil
 }
 
+// NoValue is the error type returned when attempting to get a value from a
+// moon doc that isn't found.
 type NoValue struct {
 	fullpath string
 	relpath  string

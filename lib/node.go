@@ -22,6 +22,7 @@ const (
 	n_list
 	n_object
 	n_variable
+	n_bool
 )
 
 var indent = "  "
@@ -475,4 +476,35 @@ func (v *variableNode) eval(ctx *context) (interface{}, error) {
 		return nil, fmt.Errorf("undefined variable: %s", *v)
 	}
 	return value, nil
+}
+
+type boolNode bool
+
+func (b *boolNode) Type() nodeType {
+	return n_bool
+}
+
+func (b *boolNode) parse(p *parser) error {
+	t := p.next()
+	if t.t != t_bool {
+		return fmt.Errorf("unexpected %s token while parsing bool", t.t)
+	}
+	switch t.s {
+	case "true":
+		*b = true
+	case "false":
+	default:
+		return fmt.Errorf("illegal lexeme for bool token: %s", t.s)
+	}
+	return nil
+}
+
+func (b *boolNode) pretty(w io.Writer, prefix string) error {
+	fmt.Fprintf(w, "%sbool:\n", prefix)
+	fmt.Fprintf(w, "%s%t\n", prefix+indent, *b)
+	return nil
+}
+
+func (b *boolNode) eval(ctx *context) (interface{}, error) {
+	return bool(*b), nil
 }

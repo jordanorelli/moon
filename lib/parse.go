@@ -153,6 +153,12 @@ func (p *parser) parseValue() (node, error) {
 				return nil, err
 			}
 			return n, nil
+		case t_bool:
+			n := new(boolNode)
+			if err := n.parse(p); err != nil {
+				return nil, err
+			}
+			return n, nil
 		default:
 			return nil, fmt.Errorf("parse error: unexpected %v token while looking for value", t.t)
 		}

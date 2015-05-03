@@ -41,6 +41,8 @@ func (t tokenType) String() string {
 		return "t_imaginary_number"
 	case t_variable:
 		return "t_variable"
+	case t_bool:
+		return "t_bool"
 	default:
 		panic(fmt.Sprintf("unknown token type: %v", t))
 	}
@@ -49,7 +51,8 @@ func (t tokenType) String() string {
 const (
 	t_error            tokenType = iota // a stored lex error
 	t_eof                               // end of file token
-	t_string                            // a string literal
+	t_string                            // a bare string
+	t_string_quoted                     // a quoted string
 	t_name                              // a name
 	t_comment                           // a comment
 	t_list_start                        // [
@@ -60,6 +63,7 @@ const (
 	t_real_number                       // a number
 	t_imaginary_number                  // an imaginary number
 	t_variable                          // e.g. @var_name, a variable name.
+	t_bool                              // a boolean token (true|false)
 )
 
 type stateFn func(*lexer) stateFn
@@ -143,6 +147,13 @@ func (l *lexer) emit(t tokenType) {
 		msg := fmt.Sprintf(`invalid name: "%s" (names cannot contain spaces)`, string(l.buf))
 		l.out <- token{t_error, msg}
 		return
+	case t_string:
+		switch string(l.buf) {
+		case "true", "false":
+			t = t_bool
+		}
+	case t_string_quoted:
+		t = t_string
 	}
 	l.out <- token{t, string(l.buf)}
 	l.buf = l.buf[0:0]
@@ -292,7 +303,7 @@ func lexQuotedString(delim rune) stateFn {
 	return func(l *lexer) stateFn {
 		switch r := l.next(); r {
 		case delim:
-			l.emit(t_string)
+			l.emit(t_string_quoted)
 			return lexRoot
 		case '\\':
 			switch r := l.next(); r {
