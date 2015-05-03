@@ -19,6 +19,34 @@ var nodes = map[tokenType]func(p *parser) node{
 	t_bool:         func(p *parser) node { return new(boolNode) },
 }
 
+var DefaultPath = "./config.moon"
+
+func bail(status int, t string, args ...interface{}) {
+	if status == 0 {
+		fmt.Fprintf(os.Stdout, t+"\n", args...)
+	} else {
+		fmt.Fprintf(os.Stderr, t+"\n", args...)
+	}
+	os.Exit(status)
+}
+
+func Parse(dest interface{}) {
+	f, err := os.Open(DefaultPath)
+	if err != nil {
+		bail(1, "unable to open moon config file at path %s: %s", DefaultPath, err)
+	}
+	defer f.Close()
+
+	doc, err := Read(f)
+	if err != nil {
+		bail(1, "unable to parse moon config file at path %s: %s", DefaultPath, err)
+	}
+
+	if err := doc.Fill(dest); err != nil {
+		bail(1, "unable to fill moon config values: %s", err)
+	}
+}
+
 // Reads a moon document from a given io.Reader. The io.Reader is advanced to
 // EOF. The reader is not closed after reading, since it's an io.Reader and not
 // an io.ReadCloser. In the event of error, the state that the source reader
@@ -69,6 +97,8 @@ func parse(r io.Reader) (node, error) {
 	return p.root, nil
 }
 
+// parser (little p) is an actual parser.  It actually does the parsing of a
+// moon document.
 type parser struct {
 	root   node
 	input  chan token
