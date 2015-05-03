@@ -29,7 +29,8 @@ import (
 	"strings"
 )
 
-// Doc represents a Moon document.
+// Doc is a representation of a Moon document in its native form.  It has no
+// configured options and deals only with opaque types.
 type Doc struct {
 	items map[string]interface{}
 }
@@ -56,6 +57,10 @@ func (d *Doc) MarshalMoon() ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
+// retrieve a value from the moon document and assign it to provided
+// destination.  dest must be a pointer.  path may be a path to the desired
+// field, e.g., people/1/name would get the name field of the second element of
+// the people list.
 func (d *Doc) Get(path string, dest interface{}) error {
 	if d.items == nil {
 		return fmt.Errorf("no item found at path %s (doc is empty)", path)
@@ -76,8 +81,97 @@ func (d *Doc) Get(path string, dest interface{}) error {
 
 	dv := reflect.ValueOf(dest)
 	dve := dv.Elem()
-	dve.Set(reflect.ValueOf(v))
+	return setValue(dve, reflect.ValueOf(v))
+}
+
+func setValue(dest, src reflect.Value) error {
+	if dest.Type() == src.Type() {
+		dest.Set(src)
+		return nil
+	}
+	switch dest.Kind() {
+	case reflect.Bool:
+		setBoolValue(dest, src)
+		return nil
+	default:
+		return fmt.Errorf("src and destination are not of same type. src type: %s, dest type: %s", src.Type().Name(), dest.Type().Name())
+	}
+}
+
+func setBoolValue(dest, src reflect.Value) error {
+	switch src.Kind() {
+	case reflect.String:
+		s := src.String()
+		if s == "false" { // lol
+			dest.Set(reflect.ValueOf(false))
+			return nil
+		}
+		dest.Set(reflect.ValueOf(true))
+		return nil
+	default:
+		return fmt.Errorf("dunno how to set a bool with that damned value")
+	}
+}
+
+// Fill takes the raw values from the moon document and assigns them to the
+// struct pointed at by dest.  Dest must be a struct pointer; any other type
+// for dest will result in an error.
+func (d *Doc) Fill(dest interface{}) error {
+	dt := reflect.TypeOf(dest)
+	if dt.Kind() != reflect.Ptr {
+		return fmt.Errorf("destination is of type %v; a pointer type is required", dt)
+	}
+
+	dv := reflect.ValueOf(dest).Elem()
+
+	n := dv.NumField()
+	for i := 0; i < n; i++ {
+		field, fv := dv.Type().Field(i), dv.Field(i)
+
+		tag := field.Tag
+		fopts, err := ReadString(string(tag))
+		if err != nil {
+			return fmt.Errorf("unable to parse options for type %s, field %s: %s",
+				dv.Type().Name(), field.Name, err)
+		}
+
+		var fname string
+		if err := fopts.Get("name", &fname); err != nil {
+			if _, ok := err.(NoValue); !ok {
+				return err
+			}
+		}
+
+		var frequired bool
+		if err := fopts.Get("required", &frequired); err != nil {
+			if _, ok := err.(NoValue); !ok {
+				return err
+			}
+		}
+
+		fdefault := fopts.items["default"]
+
+		v, ok := d.items[fname]
+		if !ok {
+			if frequired {
+				return fmt.Errorf("required field missing: %s", fname)
+			} else {
+				fv.Set(reflect.ValueOf(fdefault))
+				continue
+			}
+		}
+		fv.Set(reflect.ValueOf(v))
+	}
 	return nil
+}
+
+type NoValue struct {
+	fullpath string
+	relpath  string
+}
+
+func (n NoValue) Error() string {
+	return fmt.Sprintf("no value found for path %s", n.relpath)
 }
 
 func seekValue(fullpath string, parts []string, root interface{}) (interface{}, error) {
@@ -109,7 +203,7 @@ func seekValue(fullpath string, parts []string, root interface{}) (interface{}, 
 
 	v, ok := m[head]
 	if !ok {
-		return nil, fmt.Errorf("unable to seek value at path %s: no value found for part %s", fullpath, head)
+		return nil, NoValue{fullpath, head}
 	}
 
 	if len(tail) == 0 {
