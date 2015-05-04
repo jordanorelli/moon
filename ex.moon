@@ -42,8 +42,8 @@ other_hash: {
 # we may reference an item that was defined earlier using a sigil
 repeat_hash: @hash
 
-# items can be hidden.  i.e., they're only valid in the parse and eval stage as
-# intermediate values internal to the config file; they are *not* visible to
+# items can be hidden.  i.e., they are only valid in the parse and eval stage
+# as intermediate values internal to the config file; they are *not* visible to
 # the host program.  This is generally useful for composing larger, more
 # complicated things.
 @hidden_item: it has a value
