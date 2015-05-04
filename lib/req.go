@@ -2,7 +2,9 @@ package moon
 
 import (
 	"fmt"
+	"io"
 	"reflect"
+	"unicode/utf8"
 )
 
 type req struct {
@@ -28,7 +30,22 @@ func (r req) validate() error {
 	if r.required && r.d_fault != nil {
 		return fmt.Errorf("invalid requirement %s: a required value cannot have a default", r.name)
 	}
+
+	if utf8.RuneCountInString(r.short) > 1 {
+		return fmt.Errorf("invalid requirement %s: provided short flag (%s) is more than 1 rune",
+			r.name, r.short)
+	}
 	return nil
+}
+
+func (r req) writeHelpLine(w io.Writer) {
+	if r.short != "" {
+		fmt.Fprintf(w, "-%s\t%s\n\n", r.short, r.name)
+		fmt.Fprintf(w, "\t%s\n\n", r.help)
+	} else if r.long != "" {
+		fmt.Fprintf(w, "--%s\t%s\n\n", r.long, r.name)
+		fmt.Fprintf(w, "\t%s\n\n", r.help)
+	}
 }
 
 func field2req(field reflect.StructField) (*req, error) {
@@ -41,6 +58,7 @@ func field2req(field reflect.StructField) (*req, error) {
 		name:    field.Name,
 		cliName: field.Name,
 		t:       field.Type,
+		long:    field.Name,
 	}
 	// it's really easy to cause infinite recursion here, since this is used by
 	// some of the higher up functions, so we're going to hack the document directly
@@ -53,6 +71,10 @@ func field2req(field reflect.StructField) (*req, error) {
 		"default":  doc.Get("default", &req.d_fault),
 		"short":    doc.Get("short", &req.short),
 		"long":     doc.Get("long", &req.long),
+	}
+
+	if req.long == field.Name && req.name != field.Name {
+		req.long = req.name
 	}
 
 	for fname, err := range errors {

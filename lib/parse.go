@@ -31,6 +31,10 @@ func bail(status int, t string, args ...interface{}) {
 }
 
 func Parse(dest interface{}) {
+	cliArgs, err := parseArgs(os.Args, dest)
+	if err != nil {
+		bail(1, "unable to parse cli args: %s", err)
+	}
 	f, err := os.Open(DefaultPath)
 	if err != nil {
 		bail(1, "unable to open moon config file at path %s: %s", DefaultPath, err)
@@ -40,6 +44,10 @@ func Parse(dest interface{}) {
 	doc, err := Read(f)
 	if err != nil {
 		bail(1, "unable to parse moon config file at path %s: %s", DefaultPath, err)
+	}
+
+	for k, v := range cliArgs {
+		doc.items[k] = v
 	}
 
 	if err := doc.Fill(dest); err != nil {
