@@ -60,8 +60,9 @@ func field2req(field reflect.StructField) (*req, error) {
 		t:       field.Type,
 		long:    field.Name,
 	}
-	// it's really easy to cause infinite recursion here, since this is used by
-	// some of the higher up functions, so we're going to hack the document directly
+
+	// this is called by Fill, so we have to do Fill's work by hand, otherwise
+	// they would be mutually recursive.
 
 	errors := map[string]error{
 		"name":     doc.Get("name", &req.name),
