@@ -1,0 +1,10 @@
+{t_duration 300ms}
+{t_duration -1.5h}
+{t_duration 2h45m}
+{t_duration 9ns}
+{t_duration 18us}
+{t_duration 45µs}
+{t_duration 900ms}
+{t_duration 275s}
+{t_duration 89m}
+{t_duration 927h}

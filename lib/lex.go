@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"time"
 	"unicode"
 )
 
@@ -43,6 +44,8 @@ func (t tokenType) String() string {
 		return "t_variable"
 	case t_bool:
 		return "t_bool"
+	case t_duration:
+		return "t_duration"
 	default:
 		panic(fmt.Sprintf("unknown token type: %v", t))
 	}
@@ -64,6 +67,7 @@ const (
 	t_imaginary_number                  // an imaginary number
 	t_variable                          // e.g. @var_name, a variable name.
 	t_bool                              // a boolean token (true|false)
+	t_duration                          // a duration (e.g.: 1s, 2h45m, 900ms)
 )
 
 type stateFn func(*lexer) stateFn
@@ -404,7 +408,8 @@ func lexNumber(l *lexer) stateFn {
 	imaginary := l.accept("i")
 	r := l.next()
 	if isAlphaNumeric(r) {
-		return lexErrorf("unexpected alphanum in lexNumber: %c", r)
+		l.keep(r)
+		return lexDuration
 	}
 	l.unread(r)
 	if imaginary {
@@ -413,6 +418,63 @@ func lexNumber(l *lexer) stateFn {
 		l.emit(t_real_number)
 	}
 	return lexRoot
+}
+
+func lexDuration(l *lexer) stateFn {
+	r := l.next()
+	switch {
+	case r == '\n', r == ';':
+		_, err := time.ParseDuration(string(l.buf))
+		if err == nil {
+			l.emit(t_duration)
+			return lexRoot
+		}
+		l.emit(t_string)
+		return lexRoot
+	case unicode.IsSpace(r):
+		_, err := time.ParseDuration(string(l.buf))
+		if err == nil {
+			l.emit(t_duration)
+			return lexRoot
+		}
+		l.keep(r)
+		return lexNameOrString
+	case r == ':':
+		_, err := time.ParseDuration(string(l.buf))
+		if err == nil {
+			l.emit(t_duration)
+		} else {
+			l.emit(t_string)
+		}
+		l.keep(r)
+		l.emit(t_object_separator)
+		return lexRoot
+	case isSpecial(r):
+		_, err := time.ParseDuration(string(l.buf))
+		if err == nil {
+			l.emit(t_duration)
+		} else {
+			l.emit(t_string)
+		}
+		l.unread(r)
+		return lexRoot
+	case r == '\\':
+		l.unread(r)
+		return lexNameOrString
+	case r == eof:
+		_, err := time.ParseDuration(string(l.buf))
+		if err == nil {
+			l.emit(t_duration)
+		} else {
+			l.emit(t_string)
+		}
+		return nil
+	case unicode.IsGraphic(r):
+		l.keep(r)
+		return lexDuration
+	default:
+		return lexErrorf("unhandled character type in lexDuration: %c", r)
+	}
 }
 
 func isAlphaNumeric(r rune) bool {
