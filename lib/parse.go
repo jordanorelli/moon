@@ -17,6 +17,7 @@ var nodes = map[tokenType]func(p *parser) node{
 	t_object_start: func(p *parser) node { p.next(); return &objectNode{} },
 	t_variable:     func(p *parser) node { return new(variableNode) },
 	t_bool:         func(p *parser) node { return new(boolNode) },
+	t_duration:     func(p *parser) node { return new(durationNode) },
 }
 
 var DefaultPath = "./config.moon"

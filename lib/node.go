@@ -8,6 +8,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type nodeType int
@@ -23,6 +24,7 @@ const (
 	n_object
 	n_variable
 	n_bool
+	n_duration
 )
 
 var indent = "  "
@@ -507,4 +509,33 @@ func (b *boolNode) pretty(w io.Writer, prefix string) error {
 
 func (b *boolNode) eval(ctx *context) (interface{}, error) {
 	return bool(*b), nil
+}
+
+type durationNode time.Duration
+
+func (d *durationNode) Type() nodeType {
+	return n_duration
+}
+
+func (d *durationNode) parse(p *parser) error {
+	t := p.next()
+	if t.t != t_duration {
+		return fmt.Errorf("unexpected %s token while parsing duration", t.t)
+	}
+	v, err := time.ParseDuration(t.s)
+	if err != nil {
+		return fmt.Errorf("unable to parse duration: %s", err)
+	}
+	*d = durationNode(v)
+	return nil
+}
+
+func (d *durationNode) pretty(w io.Writer, prefix string) error {
+	fmt.Fprintf(w, "%sdur:\n", prefix)
+	fmt.Fprintf(w, "%s%s\n", prefix+indent, time.Duration(*d).String())
+	return nil
+}
+
+func (d *durationNode) eval(ctx *context) (interface{}, error) {
+	return *d, nil
 }
