@@ -37,20 +37,19 @@ func Parse(dest interface{}) {
 		bail(1, "unable to parse cli args: %s", err)
 	}
 
-    var doc *Doc
+	var doc *Doc
 
 	f, err := os.Open(DefaultPath)
 	if err == nil {
-        defer f.Close()
-        d, err := Read(f)
-        if err != nil {
-            bail(1, "unable to parse moon config file at path %s: %s", DefaultPath, err)
-        }
-        doc = d
+		defer f.Close()
+		d, err := Read(f)
+		if err != nil {
+			bail(1, "unable to parse moon config file at path %s: %s", DefaultPath, err)
+		}
+		doc = d
 	} else {
-        doc = &Doc{items: make(map[string]interface{})}
-    }
-
+		doc = &Doc{items: make(map[string]interface{})}
+	}
 
 	for k, v := range cliArgs {
 		doc.items[k] = v
