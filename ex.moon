@@ -21,6 +21,10 @@ bool_false: false
 string_true: "true"
 string_false: "false"
 
+# bare strings that can be parsed as durations are parsed as durations.
+dur_one: 30s
+dur_two: 5h3m27s9ms
+
 # lists of things should be supported
 items: [
     one
