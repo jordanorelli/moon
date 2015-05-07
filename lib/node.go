@@ -537,5 +537,5 @@ func (d *durationNode) pretty(w io.Writer, prefix string) error {
 }
 
 func (d *durationNode) eval(ctx *context) (interface{}, error) {
-	return *d, nil
+	return time.Duration(*d), nil
 }
