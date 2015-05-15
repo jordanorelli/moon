@@ -1,0 +1,19 @@
+{t_name a_doc}
+{t_object_separator :}
+{t_string This is a here document!
+You should be able to put anything in this at all!
+# Even this thing that looks like a comment, it's not a comment!
+WHEEEEEEEEEEEEEEEE
+Even nested here docs should work!!!
+nope: <<DIFFERENT
+hahahahhaha
+this is still part of the outer one
+there is no inner here doc!
+lololol
+DIFFERENT
+ok but we're done now
+let's finish up here.
+}
+{t_name foo}
+{t_object_separator :}
+{t_string bar}

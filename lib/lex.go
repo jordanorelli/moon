@@ -2,6 +2,7 @@ package moon
 
 import (
 	"bufio"
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -260,6 +261,12 @@ func lexRoot(l *lexer) stateFn {
 	case r == '.':
 		l.keep(r)
 		return lexAfterPeriod
+	case r == '<':
+		if l.peek() == '<' {
+			l.next()
+			return lexHeredocStart
+		}
+		fallthrough
 	case r == '@':
 		return lexVariable
 	case strings.IndexRune("+-0123456789", r) >= 0:
@@ -474,6 +481,50 @@ func lexDuration(l *lexer) stateFn {
 		return lexDuration
 	default:
 		return lexErrorf("unhandled character type in lexDuration: %c", r)
+	}
+}
+
+func lexHeredocStart(l *lexer) stateFn {
+	r := l.next()
+	switch {
+	case r == '\n':
+		if len(l.buf) == 0 {
+			return lexErrorf("illegal zero-width heredoc name")
+		}
+		label := string(l.buf)
+		l.buf = l.buf[0:0]
+		return lexHeredocBody(label)
+	case unicode.IsUpper(r):
+		l.keep(r)
+		return lexHeredocStart
+	case r == eof:
+		return lexErrorf("unexpected EOF in lexHeredocStart")
+	default:
+		return lexErrorf("unexpected rune in lexHeredocStart: %c (only uppercase letters are ok here)", r)
+	}
+}
+
+func lexHeredocBody(label string) stateFn {
+	var body bytes.Buffer
+	line := make([]rune, 0, 128)
+	return func(l *lexer) stateFn {
+		for {
+			r := l.next()
+			switch r {
+			case '\n':
+				if string(line) == label {
+					l.out <- token{t_string, string(body.Bytes())}
+					return lexRoot
+				}
+				body.WriteString(string(line))
+				line = line[0:0]
+				body.WriteRune(r)
+			case eof:
+				return lexErrorf("unexpected eof inside of heredoc %s", label)
+			default:
+				line = append(line, r)
+			}
+		}
 	}
 }
 
