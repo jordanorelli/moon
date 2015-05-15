@@ -66,3 +66,26 @@ visible_item: @hidden_item
 }
 
 people: [@person_one @person_two]
+
+# if you need to embed a large block of text, bash-style HERE documents are
+# supported.
+
+startup: <<EOF
+This is a here document.  The << operator indicates that a label for a heredoc
+is incoming.  <<EOF thus begins a heredoc with the label EOF.  A heredoc may be
+closed by indicating the label name on a line all by itself.
+
+http://en.wikipedia.org/wiki/Here_document
+
+A heredoc may contain any characters at all and they require no escaping.
+# This line that looks a bit like a comment is not a comment; it will be
+# included in the output.
+{ <-- that didn't start an object
+and this won't end one --> }
+because there are no types inside of here documents; the whole thing is just
+one big string.
+
+This is the last line of the here doc. The next line is the terminator.
+EOF
+
+# This comment is outside of the heredoc.
