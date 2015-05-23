@@ -150,7 +150,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/jordanorelli/moon/lib"
+	"github.com/jordanorelli/moon"
 	"io"
 	"os"
 )
