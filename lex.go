@@ -274,7 +274,7 @@ func lexRoot(l *lexer) stateFn {
 		return lexNumber
 	case unicode.IsSpace(r):
 		return lexRoot
-	case unicode.IsLower(r), unicode.IsUpper(r):
+	case unicode.IsPrint(r):
 		l.keep(r)
 		return lexNameOrString
 	default:

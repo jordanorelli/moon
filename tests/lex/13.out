@@ -1,0 +1,4 @@
+{t_comment  https://github.com/jordanorelli/moon/issues/2}
+{t_name some_path}
+{t_object_separator :}
+{t_string /path/to/file}
