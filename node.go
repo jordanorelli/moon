@@ -284,17 +284,24 @@ func (n *numberNode) Type() nodeType {
 
 func (n *numberNode) parse(p *parser) error {
 	t := p.next()
-	if t.t != t_real_number {
-		return fmt.Errorf("unexpected %s token while parsing number", t.t)
-	}
-
-	if p.peek().t == t_imaginary_number {
+	switch t.t {
+	case t_real_number:
+		if p.peek().t == t_imaginary_number {
+			n.t = num_complex
+			s := t.s + p.next().s
+			if _, err := fmt.Sscan(s, &n.c); err != nil {
+				return fmt.Errorf("ungood imaginary number format %s: %s", s, err)
+			}
+			return nil
+		}
+	case t_imaginary_number:
 		n.t = num_complex
-		s := t.s + p.next().s
-		if _, err := fmt.Sscan(s, &n.c); err != nil {
-			return fmt.Errorf("ungood imaginary number format %s: %s", s, err)
+		if _, err := fmt.Sscan("0+"+t.s, &n.c); err != nil {
+			return fmt.Errorf("ungood imaginary number format %s: %s", t.s, err)
 		}
 		return nil
+	default:
+		return fmt.Errorf("unexpected %s token while parsing number", t.t)
 	}
 
 	i, err := strconv.ParseInt(t.s, 0, 64)

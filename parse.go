@@ -11,13 +11,14 @@ import (
 const ()
 
 var nodes = map[tokenType]func(p *parser) node{
-	t_string:       func(p *parser) node { return new(stringNode) },
-	t_real_number:  func(p *parser) node { return new(numberNode) },
-	t_list_start:   func(p *parser) node { p.next(); return &listNode{} },
-	t_object_start: func(p *parser) node { p.next(); return &objectNode{} },
-	t_variable:     func(p *parser) node { return new(variableNode) },
-	t_bool:         func(p *parser) node { return new(boolNode) },
-	t_duration:     func(p *parser) node { return new(durationNode) },
+	t_string:           func(p *parser) node { return new(stringNode) },
+	t_real_number:      func(p *parser) node { return new(numberNode) },
+	t_imaginary_number: func(p *parser) node { return new(numberNode) },
+	t_list_start:       func(p *parser) node { p.next(); return &listNode{} },
+	t_object_start:     func(p *parser) node { p.next(); return &objectNode{} },
+	t_variable:         func(p *parser) node { return new(variableNode) },
+	t_bool:             func(p *parser) node { return new(boolNode) },
+	t_duration:         func(p *parser) node { return new(durationNode) },
 }
 
 var DefaultPath = "./config.moon"
