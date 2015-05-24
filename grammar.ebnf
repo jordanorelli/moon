@@ -5,6 +5,7 @@ Variable ::= "@" Identifier
 Bare_String ::= (GraphicChar | ("\" Char)) +
 Quoted_String ::= '"' ([^"\] | "\" Char) * '"'
               | "'" ([^'\] | "\" Char) * "'"
+Comment ::= '#' PrintChar +
 
 Integer ::= [+-] ? Digit +
 Hex ::= [+-] ? "0" [xX] (Digit | [a-fA-F]) +
