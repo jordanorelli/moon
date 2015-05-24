@@ -43,10 +43,10 @@ writing the config files themselves.
 
 Historically, I have always used json as the configuration format for Go
 projects.  I've found this to be the best option.  It's in the standard
-library, so it doesn't add any dependencies to your project.  Everyone can
-understand it, and those that don't pick it up very quickly.  It's a nearly
-ideal format, inasmuch as it doesn't litter itself with spurious information,
-it's relatively compact, and it's a familiar set of non-word characters that
+library, so it doesn't add any dependencies to your project.  For small
+configurations, json is very easy for a human to write.  It's a nearly ideal
+format, inasmuch as it doesn't litter itself with spurious information, it's
+relatively compact, and it's a familiar set of non-word characters that
 everyone can grok.  The parsing API is also quite nice, and the json package in
 the standard library is extremely easy to use.  As far as programming the host
 application, json works very well.
@@ -72,15 +72,8 @@ It also seems to drive my colleagues in ops into an absolute rage.
 
 #### Why not YAML?
 
-Every time I use YAML I accidentally break it.  It's incredibly brittle.  I
-actually do buy the argument that semantic whitespace is great for humans.  I
-programmed a significant amount of Python and loved every minute of it.
-
-But where it really breaks down is that semantic whitespace is an absolute
-showstopper when it comes to generating a configuration file from a template
-system, which is a common technique in
-[Chef](http://en.wikipedia.org/wiki/Chef_%28software%29), the configuration
-management tool we use [where I work](https://www.etsy.com/).  Beyond being
-impossible to template out, it's much, much too complicated.  The YAML spec is
-nearly as large as the specification for Go itself!
+Semantic whitespace makes it difficult to generate YAML from within a template
+language, such as ERB.  Generating configuration files from templates or from a
+parent application is a common strategy when using configuration management
+systems, such as [Chef](https://www.chef.io/chef/).
 

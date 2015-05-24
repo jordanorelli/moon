@@ -1,42 +1,27 @@
-This is a toy configuration language.  If you want to know why, see the [WHY](WHY.md) doc.
+# Moon
+
+Moon is a human-readable data exchange format designed to be used as a
+configuration language in software projects. This projects contains a
+description of Moon's grammar and a reference implementation of a moon
+interpreter written in Go. For some history as to why this project was seen as
+worthwhile, please see the [WHY](WHY.md) doc. For a description of Moon's
+design goals (and non-goals), please see the [GOALS](GOALS.md) doc.
 
 # Instability
 
-This isn't even remotely stable.  Don't use this in an actual project, I
-promise you I will break this.
+This project is not yet stable. Things may change. It's not recommended that
+you use this in any type of production system, since I can't guarantee future
+compatibility at this time.
 
-# What it is
+# Design
 
-Moon is a configuration language intended to replace JSON as a configuration
-format in Go projects.  The syntax is fairly similar, with a few changes:
+A Moon file is a human-readable description of an unordered collection of
+key-value pairs. Parsing a Moon document always yields either a Moon Document
+or an error.
 
-- instead of having some hand-wavy "number" thing without ever specifying the
-  valid ranges or anything like that, there are two number types: int and
-  float64.  Int means int32 on 32bit systems and int64 on 64bit systems.  Maybe
-  I'll go back on that because it sounds really dumb when I type it out.
-- support for complex numbers.  The only reason I included this is that it's
-  included in the text/template package in the standard library and I stole the
-  number-parsing code from that library.
-- bare strings.  Support here is somewhat up in the air.  Inside of bare
-  strings, the characters [, ], ;, :, {, and } must be escaped, because each of
-  those can terminate a bare string.
-- comments.  There are no comments in JSON and that's incredibly annoying.
-  Moon has them.
-- variables.  In moon, you can make a reference to a value that was already
-  defined.
-- hidden variables.  This sounds really dumb but it quickly became apparent
-  that if you're using variables to compose something, those variables end up
-  polluting the namespace of the moon document.
-- a command-line tool.  I'm sure these exist for json but there's no official
-  "this is the tool, that one isn't" decree.
-- something kinda like xpath that lets you select elements in a document.
+The top level of a Moon document contains a series of key-value pairs separated with a colon:
 
-# How it works
-
-json and similar formats parse text and render some kind of parse tree.  We do
-the same thing in moon, but then we walk the tree and evaluate it, which is why
-variables are a thing.  It's effectively just enough of a dynamic language
-interpreter for variables to work.
+![Assignment Diagram](grammar/diagram/Assign.png)
 
 # Types
 
