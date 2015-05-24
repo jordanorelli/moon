@@ -13,6 +13,96 @@ This project is not yet stable. Things may change. It's not recommended that
 you use this in any type of production system, since I can't guarantee future
 compatibility at this time.
 
+# Example
+
+```
+# strings don't require quotes
+first_name: jordan
+last_name: orelli
+
+# but you may quote them if you wish
+city: "Brooklyn"
+
+# this is an integer
+age: 29
+
+# this is a float
+pi: 3.14
+
+# lists defined ordered collections and are contained in square brackets. There is no separator character.
+numbers: [1 2 3]
+quoted_strings: ["one" "two" "three"]
+bare_strings: [one; two; three]
+nested_list: [
+  [0 0]
+  [0 3]
+  [5 0]
+]
+
+# objects described unordered collections and are contained in curly braces.
+object: {key: value; other_key: other_value}
+
+other_object: {
+    key_1: one
+    key_2: 2
+    key_3: 3.4
+    key_4: [five; 6 7.8]
+}
+
+# bare strings that can be parsed as durations are parsed as durations.
+
+# thirty seconds
+dur_one: 30s
+
+# 5 hours, 3 minutes, 27 seconds and 9 milliseconds
+dur_two: 5h3m27s9ms
+
+# we may reference an item that was defined earlier using a sigil
+repeat_object: @object
+
+# items can be hidden.  i.e., they are only valid in the parse and eval stage
+# as intermediate values internal to the config file; they are *not* visible to
+# the host program.  This is generally useful for composing larger, more
+# complicated things.
+@hidden_item: it has a value
+visible_item: @hidden_item
+
+@person_one: {
+    name: the first name here
+    age: 28
+    hometown: crooklyn
+}
+
+@person_two: {
+    name: the second name here
+    age: 30
+    hometown: tha bronx
+}
+
+people: [@person_one @person_two]
+
+# if you need to embed a large block of text, bash-style HERE documents are
+# supported.
+
+startup: <<EOF
+This is a here document.  The << operator indicates that a label for a heredoc
+is incoming.  <<EOF thus begins a heredoc with the label EOF.  A heredoc may be
+closed by indicating the label name on a line all by itself.
+
+http://en.wikipedia.org/wiki/Here_document
+
+A heredoc may contain any characters at all and they require no escaping.
+# This line that looks a bit like a comment is not a comment; it will be
+# included in the output.
+{ <-- that didn't start an object
+and this won't end one --> }
+because there are no types inside of here documents; the whole thing is just
+one big string.
+This is the last line of the here doc. The next line is the terminator.
+EOF
+# This comment is outside of the heredoc.
+```
+
 # Design
 
 A Moon file is a human-readable description of an unordered collection of
@@ -83,154 +173,81 @@ types: strings, numbers, durations, variables, objects, and lists.
 
 Strings come in two flavors: bare strings and quoted strings.
 
+##### Bare Strings
+
 A bare string is defined as being any run of graphic characters.
 
 ![Bare String Diagram](grammar/diagram/Bare_String.png)
 
-Since the newline character is excluded from the graphic characters, a bare string is terminated at the first unescaped newline.
-
-# Types
-
-Moon defines the following types:
-
-- integers: right now this is an int based on Go semantics; it's a 32 bit int
-  on 32 bit CPUs, and a 64 bit int on 64 bit CPUs.  These are some integers:
-
+Since the newline character is excluded from the graphic characters, a bare string is terminated at the first unescaped newline. Any unescaped terminal character (such as the semicolon) will terminate a bare string. Bare strings are so named because they are *not* wrapped in quotes. These are bare strings:
 ```
-1
-2
--1
--12348
-0
-+0
+it was the best of times, it was the worst of times
+I'm a bare string with a quote in me!
+But I have to escape \[ these brackets \]
+```
+The following is a sequence of three bare strings:
+```
+one; two; three
 ```
 
-- floats: they're all float64.  These are some floats:
+##### Quoted Strings
+
+A string may be enclosed in quotes. Either single quotes or double quotes may be used.
+
+![Quoted String Diagram](grammar/diagram/Quoted_String.png)
+
+Using a single quote inside of a single-quoted string or a double-quote inside of a double-quoted string requires escaping the enclosed quote with a backslash. Quoted strings may contain newlines. These are quoted strings:
+```
+"I am a great quoted string"
+'so am I!'
+"I have some \"escped\" quotes inside of me"
 
 ```
-1.0
-1.2
--9.3
-3.14
-1e9
-```
 
-- complex numbers: they're complex128 values in Go.  These are some complex numbers:
+# Integers
 
-```
-1+2i
--9+4i
-```
+Integers are any whole number that can fit into a 32 or 64 bit integer value (depending on architecture). On 32 bit machines, an Integer is defined as int32, and on 64 bit machines, an Integer is defined as int64.  Integers may be represented using either decimal, octal, or hexadecimal notation.
 
-- strings: they're strings.  They're not explicitly required to be composed of
-  UTF-8 runes but I haven't really been testing binary data, so for the moment,
-  all bets are off here.  They're quoted, but maybe I'll go back on that.
-  These are strings:
+##### Decimal Integers
 
-```
-this is a bare string
-"this is a quoted string"
-'this is also a quoted string'
+Decimal integers are represented by a run of digit characters, optionally preceded by a sign.
 
-inside of a bare string, "quotes" don't need to be escaped
-but semicolons \;, colons \:, parens \( and \), brackets \[ and \] and braces \{ \} need to be escaped.
-```
+![Integer Diagram](grammar/diagram/Integer.png)
 
-  You can use single or double quotes.  Escape quotes with a backslash.  Quoted
-  strings may contain newlines and special characters.
+##### Octal Integers
 
-  The following characters are special characters: `:`, `;`, `[`, `]`, `#`,
-  `{`, and `}`.  The colon is used to separate a key from a value.  The
-  semicolon is used to terminate a bare string.  A newline will also terminate
-  a bare string.  A close bracket must be a special string in order to support
-  a bare string being the last element of a list, without requiring that you
-  add a semicolon after it.  An open bracket doesn't need to be a special
-  character, but I made it a special character to be symetrical with the close
-  bracket.  The same logic applies for braces.
+Octal integers are written with a preceding `0` character, followed by 1 or more characters in the range `[0-7]`.
 
-- objects: or maybe you call them hashes, objects, or associative arrays.  Moon
-  calls them objects, but you'd never know it because it's actually the
-  `map[string]interface{}` type in Go, which is effectively the same thing.
-  Keys are bare strings, but object keys may not contain spaces.
+![Octal Diagram](grammar/diagram/Octal.png)
 
-  These are some objects:
+##### Hexadecimal Integers
 
-```
-# key-value pairs are delimited by spaces; no commas are required
-{name: "jordan" age: 28}
+Hex integers are written with a preceding `0x` or `0X`, followed by one or more hex characters.
 
-{
-    one: 1
-    two: two is also a number
-    pi: 3.14
-}
+![Hex Diagram](grammar/diagram/Hex.png)
 
-# you may use a bare string as a value, but a semicolon is required to
-# terminate the bare string
-{name: jordan; age: 28}
-```
+# Floats
 
-- lists: they're `[]interface{}` values.  They're not typed, and they can be
-  heterogenous.  Values are separated by spaces.  I might put commas back in,
-  that's kinda up in the air right now.  These are some lists:
+Floating point numbers are represented using one or more decimal points.
 
-```
-[1 2 3]
-[
-  one
-  2
-  3.14
-]
+![Float Diagram](grammar/diagram/Float.png)
 
-# this is a list of three elements
-[moe; larry; curly]
+Additionally, any number written in [E Notation](http://en.wikipedia.org/wiki/Scientific_notation#E_notation) is treated as a float.
 
-# this is a list of one element
-[moe larry curl]
-```
+# Complex numbers
 
-- variables: a variable is indicated with a `@` character.  A variable may
-  refer to any key that has already been defined in the current moon document.
-  Here is an example of how you would use a variable:
+I'm pretty sure this diagram is wrong.
 
-```
-original_value: this is the original value, which is a string
-duplicate_value: @original_value
-```
+![Complex Diagram](grammar/diagram/Complex.png)
 
-  If the name of a key begins with an `@` character, it is a private key.  A
-  private key may be referenced in the rest of the moon document, but it is not
-  available anywhere outside of the moon document parser.  This is useful for
-  the composition of larger, nested values, without polluting the document's
-  root namespace.  Here is an example of a private key:
+# Lists
 
-```
-@my_private_key: a great value
-my_public_key: @my_private_key
-```
+![List Diagram](grammar/diagram/List.png)
 
-  This isn't particularly useful for simple values, but consider the following:
+# Objects
 
-```
-@prod: {
-    label: production
-    hostname: prod.example.com
-    port: 9000
-    user: prod-user
-}
+![Object Diagram](grammar/diagram/Object.png)
 
-@dev: {
-    label: development
-    hostname: dev.example.com
-    port: 9200
-    user: dev-user
-}
+# Variables
 
-servers: [@prod @dev]
-```
-
-  The only key in the root namespace of the document is `servers`; the
-  individual server configs are considered only a part of the document.  Since
-  we know that these values are private to the document itself, we know we are
-  free to modify them as we see fit, without affecting how the host program
-  sees the moon document.
+![Variable Diagram](grammar/diagram/Variable.png)
