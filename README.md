@@ -16,12 +16,78 @@ compatibility at this time.
 # Design
 
 A Moon file is a human-readable description of an unordered collection of
-key-value pairs. Parsing a Moon document always yields either a Moon Document
+key-value pairs. Parsing a Moon file always yields either a Moon Document
 or an error.
 
 The top level of a Moon document contains a series of key-value pairs separated with a colon:
 
 ![Assignment Diagram](grammar/diagram/Assign.png)
+
+E.g.:
+
+```
+name: Jordan
+age: 29
+```
+
+# Terminal characters
+
+![Terminal Characters Diagram](grammar/diagram/Terminal.png)
+
+The following characters are defined as being terminal characters: `[`, `]`,
+`{`, `}`, `:`, `;`, `#` and `\n`. Unless escaped or quoted, terminal characters
+terminate any value that precedes them.
+
+# Printable characters
+
+![Printable Characters Diagram](grammar/diagram/PrintChar.png)
+
+A printable character is defined as being any Unicode character in the
+categories L (letters), N (numbers), M (marks), S (symbols), and P
+(punctuation), with the exception of previously mentioned terminal characters.
+
+# Graphic characters
+
+![Graphic Characters Diagram](grammar/diagram/GraphicChar.png)
+
+A Graphic character is defined as being a Printable character or whitespace
+character. This includes all of the characters in the unicode category Z, with
+the exception of the newline character, which is considered a terminal
+character.
+
+# Identifiers
+
+![Identifier Diagram](grammar/diagram/Identifier.png)
+
+Any run of printable characters may describe an identifier. That is, any
+sequence of letters and numbers may describe an identifier. Identifiers may not contain spaces. Identifiers may
+contain characters outside of the ASCII range without needing any special
+escaping. This includes accented letters, marks, and emoji. The following are
+valid identifiers:
+
+```
+hello
+halló
+您好
+🐼🔫🎁
+```
+
+# Values
+
+![Value Diagram](grammar/diagram/Value.png)
+
+A Value may represent a variety of types. Moon defines the following value
+types: strings, numbers, durations, variables, objects, and lists.
+
+# Strings
+
+Strings come in two flavors: bare strings and quoted strings.
+
+A bare string is defined as being any run of graphic characters.
+
+![Bare String Diagram](grammar/diagram/Bare_String.png)
+
+Since the newline character is excluded from the graphic characters, a bare string is terminated at the first unescaped newline.
 
 # Types
 

@@ -5,9 +5,9 @@ Variable ::= "@" Identifier
 Bare_String ::= (GraphicChar | ("\" Char)) +
 Quoted_String ::= '"' ([^"\] | "\" Char) * '"'
               | "'" ([^'\] | "\" Char) * "'"
-Comment ::= '#' PrintChar +
+Comment ::= '#' GraphicChar +
 
-Integer ::= [+-] ? Digit +
+Integer ::= [+-] ? ([1-9] Digit + | [0])
 Hex ::= [+-] ? "0" [xX] (Digit | [a-fA-F]) +
 Octal ::= [+-] ? "0" [0-7] +
 Float ::= [+-]? Digit+ ("." Digit +)? ([eE] [+-] ? Digit +)?
