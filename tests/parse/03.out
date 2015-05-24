@@ -4,9 +4,9 @@ root:
       items
     value:
       list:
-        number:
+        int:
           1
-        number:
+        int:
           2
-        number:
+        int:
           3

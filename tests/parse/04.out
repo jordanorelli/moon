@@ -3,31 +3,31 @@ root:
     name:
       root_int
     value:
-      number:
+      int:
         1
   assign:
     name:
       root_float
     value:
-      number:
+      float:
         1.2
   assign:
     name:
       root_exp
     value:
-      number:
+      float:
         1e+09
   assign:
     name:
       root_hex
     value:
-      number:
+      int:
         703710
   assign:
     name:
       root_oct
     value:
-      number:
+      int:
         511
   assign:
     name:
@@ -48,18 +48,18 @@ root:
                 string:
                   three
             item_two:
-              number:
+              int:
                 2
         item_one:
-          number:
+          int:
             1
         item_three:
           list:
-            number:
+            int:
               1
-            number:
+            int:
               2
-            number:
+            int:
               3
         item_two:
           string:

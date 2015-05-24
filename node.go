@@ -319,7 +319,14 @@ func (n *numberNode) pretty(w io.Writer, prefix string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Fprintf(w, "%snumber:\n%s%s%v\n", prefix, prefix, indent, v)
+	switch n.t {
+	case num_int:
+		fmt.Fprintf(w, "%sint:\n%s%s%v\n", prefix, prefix, indent, v)
+	case num_float:
+		fmt.Fprintf(w, "%sfloat:\n%s%s%v\n", prefix, prefix, indent, v)
+	case num_complex:
+		fmt.Fprintf(w, "%scomplex:\n%s%s%v\n", prefix, prefix, indent, v)
+	}
 	return nil
 }
 

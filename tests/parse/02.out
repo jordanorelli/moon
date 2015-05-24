@@ -9,65 +9,65 @@ root:
     name:
       an_int
     value:
-      number:
+      int:
         1
   assign:
     name:
       another_int
     value:
-      number:
+      int:
         9
   assign:
     name:
       moar_int
     value:
-      number:
+      int:
         -12
   assign:
     name:
       a_float
     value:
-      number:
+      float:
         1
   assign:
     name:
       another_float
     value:
-      number:
+      float:
         -0.9
   assign:
     name:
       extra_floaty
     value:
-      number:
+      float:
         1.2
   assign:
     name:
       complex1
     value:
-      number:
+      complex:
         (1+1i)
   assign:
     name:
       complex2
     value:
-      number:
+      complex:
         (1+0i)
   assign:
     name:
       complex3
     value:
-      number:
+      complex:
         (1.3+4.7i)
   assign:
     name:
       complex4
     value:
-      number:
+      complex:
         (-4.2+8.9i)
   assign:
     name:
       complex5
     value:
-      number:
+      complex:
         (4.2-8.9i)
