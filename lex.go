@@ -358,7 +358,7 @@ func lexNameOrString(l *lexer) stateFn {
 	case r == eof:
 		l.emit(t_string)
 		return nil
-	case unicode.IsGraphic(r):
+	case unicode.IsPrint(r):
 		l.keep(r)
 		return lexNameOrString
 	default:
@@ -386,7 +386,7 @@ func lexVariable(l *lexer) stateFn {
 	case r == eof:
 		l.emit(t_variable)
 		return nil
-	case unicode.IsGraphic(r):
+	case unicode.IsPrint(r):
 		l.keep(r)
 		return lexVariable
 	default:
@@ -451,7 +451,7 @@ func lexDuration(l *lexer) stateFn {
 		if err == nil {
 			l.emit(t_duration)
 		} else {
-			l.emit(t_string)
+			l.emit(t_name)
 		}
 		l.keep(r)
 		l.emit(t_object_separator)
@@ -476,7 +476,7 @@ func lexDuration(l *lexer) stateFn {
 			l.emit(t_string)
 		}
 		return nil
-	case unicode.IsGraphic(r):
+	case unicode.IsPrint(r):
 		l.keep(r)
 		return lexDuration
 	default:

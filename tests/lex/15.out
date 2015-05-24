@@ -1,0 +1,3 @@
+{t_name mix_string}
+{t_object_separator :}
+{t_string this is "one" bare string that contains quotes}
