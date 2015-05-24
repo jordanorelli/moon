@@ -1,0 +1,701 @@
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+   <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      <meta name="generator" content="Railroad Diagram Generator 1.39.959"><style type="text/css" xml:space="preserve">
+    ::-moz-selection
+    {
+      color: #F0F8FD;
+      background: #02090D;
+    }
+    ::selection
+    {
+      color: #F0F8FD;
+      background: #02090D;
+    }      
+    .ebnf a
+    {
+      text-decoration: none;
+    }
+    .ebnf a:hover
+    {
+      color: #010304;
+      text-decoration: underline;
+    }    
+    .signature
+    {
+      color: #104F6F;
+      font-size: 11px;
+      text-align: right;
+    }
+    body
+    {
+      font: normal 12px Verdana, sans-serif;
+      color: #02090D;
+      background: #F0F8FD;
+    }
+    a:link, a:visited
+    {
+      color: #02090D;
+    }
+    a:link.signature, a:visited.signature
+    {
+      color: #104F6F;
+    }
+    a.button, #tabs li a
+    {
+      padding: 0.25em 0.5em;
+      border: 1px solid #104F6F;
+      background: #CAE0EB;
+      color: #104F6F;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    a.button:hover, #tabs li a:hover
+    {
+      color: #010304;
+      background: #D5EDF9;
+      border-color: #010304;       
+    }     
+    #tabs
+    {
+      padding: 3px 10px;
+      margin-left: 0;
+      margin-top: 58px;
+      border-bottom: 1px solid #02090D;
+    }  
+    #tabs li
+    {
+      list-style: none;
+      margin-left: 5px;
+      display: inline;
+    }
+    #tabs li a
+    {     
+      border-bottom: 1px solid #02090D;
+    }
+    #tabs li a.active
+    {
+      color: #02090D;
+      background: #F0F8FD;
+      border-color: #02090D;
+      border-bottom: 1px solid #F0F8FD;
+      outline: none;
+    }
+    #divs div
+    {
+      display: none;
+      overflow:auto;
+    }
+    #divs div.active
+    {
+      display: block;
+    }
+    #text
+    {
+      border-color: #104F6F;
+      background: #F9FCFE;
+      color: #010304;
+    }
+    .small
+    {
+      vertical-align: top;
+      text-align: right;
+      font-size: 9px;
+      font-weight: normal;
+      line-height: 120%;
+    }
+    td.small
+    {
+      padding-top: 0px;
+    }
+    .hidden
+    {
+      visibility: hidden;
+    }
+    td:hover .hidden 
+    {
+      visibility: visible;
+    }
+    div.download
+    {
+      display: none;
+      background: #F0F8FD;
+      position: absolute;
+      right: 34px;
+      top: 94px;
+      padding: 10px;
+      border: 1px dotted #02090D;
+    }
+    #divs div.ebnf, div.ebnf
+    {
+      display: block;
+      padding-left: 16px;
+      padding-top: 2px; 
+      padding-bottom: 2px; 
+      background: #D5EDF9;
+    }
+    table.palette
+    {
+      border-top: 1px solid #010304;
+      border-right: 1px solid #010304;
+      margin-bottom: 4px
+    }
+    td.palette
+    {
+      border-bottom: 1px solid #010304;
+      border-left: 1px solid #010304;
+    }
+    a.palette
+    {
+      padding: 2px 3px 2px 10px;
+      text-decoration: none;
+    }
+    .palette
+    {
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -o-user-select: none;
+      -ms-user-select: none;
+    }
+  </style></head>
+   <body>
+      
+      <p style="font-size: 14px; font-weight:bold"><a name="Assign">Assign:</a></p>
+      <img border="0" src="diagram/Assign.png" height="36" width="252" usemap="#Assign.map"><map name="Assign.map">
+         <area shape="rect" coords="29,1,105,33" href="#Identifier" title="Identifier">
+         <area shape="rect" coords="169,1,223,33" href="#Value" title="Value"></map>
+      
+      <p>
+         
+         <div class="ebnf"><pre><a href="#Assign" title="Assign" shape="rect">Assign</a>   ::= <a href="#Identifier" title="Identifier" shape="rect">Identifier</a> ':' <a href="#Value" title="Value" shape="rect">Value</a></pre></div>
+         
+      </p>
+      
+      <p>no references</p><br><p style="font-size: 14px; font-weight:bold"><a name="Assign_Hidden">Assign_Hidden:</a></p>
+      <img border="0" src="diagram/Assign_Hidden.png" height="36" width="246" usemap="#Assign_Hidden.map"><map name="Assign_Hidden.map">
+         <area shape="rect" coords="29,1,99,33" href="#Variable" title="Variable">
+         <area shape="rect" coords="163,1,217,33" href="#Value" title="Value"></map>
+      
+      <p>
+         
+         <div class="ebnf"><pre><a href="#Assign_Hidden" title="Assign_Hidden" shape="rect">Assign_Hidden</a>
+         ::= <a href="#Variable" title="Variable" shape="rect">Variable</a> ':' <a href="#Value" title="Value" shape="rect">Value</a></pre></div>
+         
+      </p>
+      
+      <p>no references</p><br><p style="font-size: 14px; font-weight:bold"><a name="Identifier">Identifier:</a></p>
+      <img border="0" src="diagram/Identifier.png" height="52" width="176" usemap="#Identifier.map"><map name="Identifier.map">
+         <area shape="rect" coords="49,17,127,49" href="#PrintChar" title="PrintChar"></map>
+      
+      <p>
+         
+         <div class="ebnf"><pre><a href="#Identifier" title="Identifier" shape="rect">Identifier</a>
+         ::= <a href="#PrintChar" title="PrintChar" shape="rect">PrintChar</a>+</pre></div>
+         
+      </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#Assign" title="Assign">Assign</a></li>
+            
+            <li><a href="#Heredoc" title="Heredoc">Heredoc</a></li>
+            
+            <li><a href="#Object" title="Object">Object</a></li>
+            
+            <li><a href="#Variable" title="Variable">Variable</a></li>
+            
+         </ul>
+         
+      </p><br><p style="font-size: 14px; font-weight:bold"><a name="Variable">Variable:</a></p>
+      <img border="0" src="diagram/Variable.png" height="36" width="186" usemap="#Variable.map"><map name="Variable.map">
+         <area shape="rect" coords="81,1,157,33" href="#Identifier" title="Identifier"></map>
+      
+      <p>
+         
+         <div class="ebnf"><pre><a href="#Variable" title="Variable" shape="rect">Variable</a> ::= '@' <a href="#Identifier" title="Identifier" shape="rect">Identifier</a></pre></div>
+         
+      </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#Assign_Hidden" title="Assign_Hidden">Assign_Hidden</a></li>
+            
+            <li><a href="#Value" title="Value">Value</a></li>
+            
+         </ul>
+         
+      </p><br><p style="font-size: 14px; font-weight:bold"><a name="Bare_String">Bare_String:</a></p>
+      <img border="0" src="diagram/Bare_String.png" height="96" width="236" usemap="#Bare_String.map"><map name="Bare_String.map">
+         <area shape="rect" coords="69,17,165,49" href="#GraphicChar" title="GraphicChar">
+         <area shape="rect" coords="117,61,167,93" href="#Char" title="Char"></map>
+      
+      <p>
+         
+         <div class="ebnf"><pre><a href="#Bare_String" title="Bare_String" shape="rect">Bare_String</a>
+         ::= ( <a href="#GraphicChar" title="GraphicChar" shape="rect">GraphicChar</a> | '\' <a href="#Char" title="Char" shape="rect">Char</a> )+</pre></div>
+         
+      </p>
+      
+      <p>no references</p><br><p style="font-size: 14px; font-weight:bold"><a name="Quoted_String">Quoted_String:</a></p>
+      <img border="0" src="diagram/Quoted_String.png" height="238" width="408" usemap="#Quoted_String.map"><map name="Quoted_String.map">
+         <area shape="rect" coords="203,61,253,93" href="#Char" title="Char">
+         <area shape="rect" coords="201,187,251,219" href="#Char" title="Char"></map>
+      
+      <p>
+         
+         <div class="ebnf"><pre><a href="#Quoted_String" title="Quoted_String" shape="rect">Quoted_String</a>
+         ::= '"' ( [^"\] | '\' <a href="#Char" title="Char" shape="rect">Char</a> )* '"'
+           | "'" ( [^'\] | '\' <a href="#Char" title="Char" shape="rect">Char</a> )* "'"</pre></div>
+         
+      </p>
+      
+      <p>no references</p><br><p style="font-size: 14px; font-weight:bold"><a name="Integer">Integer:</a></p>
+      <img border="0" src="diagram/Integer.png" height="112" width="236" usemap="#Integer.map"><map name="Integer.map">
+         <area shape="rect" coords="139,17,187,49" href="#Digit" title="Digit"></map>
+      
+      <p>
+         
+         <div class="ebnf"><pre><a href="#Integer" title="Integer" shape="rect">Integer</a>  ::= [+#x2D]? <a href="#Digit" title="Digit" shape="rect">Digit</a>+</pre></div>
+         
+      </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#Complex" title="Complex">Complex</a></li>
+            
+            <li><a href="#Numer" title="Numer">Numer</a></li>
+            
+         </ul>
+         
+      </p><br><p style="font-size: 14px; font-weight:bold"><a name="Hex">Hex:</a></p>
+      <img border="0" src="diagram/Hex.png" height="140" width="424" usemap="#Hex.map"><map name="Hex.map">
+         <area shape="rect" coords="295,17,343,49" href="#Digit" title="Digit"></map>
+      
+      <p>
+         
+         <div class="ebnf"><pre><a href="#Hex" title="Hex" shape="rect">Hex</a>      ::= [+#x2D]? '0' [xX] ( <a href="#Digit" title="Digit" shape="rect">Digit</a> | [a-fA-F] )+</pre></div>
+         
+      </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#Numer" title="Numer">Numer</a></li>
+            
+         </ul>
+         
+      </p><br><p style="font-size: 14px; font-weight:bold"><a name="Octal">Octal:</a></p>
+      <img border="0" src="diagram/Octal.png" height="112" width="296">
+      
+      <p>
+         
+         <div class="ebnf"><pre><a href="#Octal" title="Octal" shape="rect">Octal</a>    ::= [+#x2D]? '0' [0-7]+</pre></div>
+         
+      </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#Numer" title="Numer">Numer</a></li>
+            
+         </ul>
+         
+      </p><br><p style="font-size: 14px; font-weight:bold"><a name="Float">Float:</a></p>
+      <img border="0" src="diagram/Float.png" height="128" width="754" usemap="#Float.map"><map name="Float.map">
+         <area shape="rect" coords="139,17,187,49" href="#Digit" title="Digit">
+         <area shape="rect" coords="311,17,359,49" href="#Digit" title="Digit">
+         <area shape="rect" coords="637,17,685,49" href="#Digit" title="Digit"></map>
+      
+      <p>
+         
+         <div class="ebnf"><pre><a href="#Float" title="Float" shape="rect">Float</a>    ::= [+#x2D]? <a href="#Digit" title="Digit" shape="rect">Digit</a>+ ( '.' <a href="#Digit" title="Digit" shape="rect">Digit</a>+ )? ( [eE] [+#x2D]? <a href="#Digit" title="Digit" shape="rect">Digit</a>+ )?</pre></div>
+         
+      </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#Complex" title="Complex">Complex</a></li>
+            
+            <li><a href="#Numer" title="Numer">Numer</a></li>
+            
+         </ul>
+         
+      </p><br><p style="font-size: 14px; font-weight:bold"><a name="Complex">Complex:</a></p>
+      <img border="0" src="diagram/Complex.png" height="96" width="464" usemap="#Complex.map"><map name="Complex.map">
+         <area shape="rect" coords="69,1,119,33" href="#Float" title="Float">
+         <area shape="rect" coords="69,45,135,77" href="#Integer" title="Integer">
+         <area shape="rect" coords="305,1,355,33" href="#Float" title="Float">
+         <area shape="rect" coords="305,45,371,77" href="#Integer" title="Integer"></map>
+      
+      <p>
+         
+         <div class="ebnf"><pre><a href="#Complex" title="Complex" shape="rect">Complex</a>  ::= ( ( <a href="#Float" title="Float" shape="rect">Float</a> | <a href="#Integer" title="Integer" shape="rect">Integer</a> ) [+#x2D] )? ( <a href="#Float" title="Float" shape="rect">Float</a> | <a href="#Integer" title="Integer" shape="rect">Integer</a> ) 'i'</pre></div>
+         
+      </p>
+      
+      <p>no references</p><br><p style="font-size: 14px; font-weight:bold"><a name="Duration">Duration:</a></p>
+      <img border="0" src="diagram/Duration.png" height="332" width="526" usemap="#Duration.map"><map name="Duration.map">
+         <area shape="rect" coords="159,33,207,65" href="#Digit" title="Digit">
+         <area shape="rect" coords="311,33,359,65" href="#Digit" title="Digit"></map>
+      
+      <p>
+         
+         <div class="ebnf"><pre><a href="#Duration" title="Duration" shape="rect">Duration</a> ::= [+#x2D]? ( <a href="#Digit" title="Digit" shape="rect">Digit</a>+ '.' <a href="#Digit" title="Digit" shape="rect">Digit</a>+ ( 'ns' | 'us' | 'µs' | 'ms' | 's' | 'm' | 'h' ) )+</pre></div>
+         
+      </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#Value" title="Value">Value</a></li>
+            
+         </ul>
+         
+      </p><br><p style="font-size: 14px; font-weight:bold"><a name="Numer">Numer:</a></p>
+      <img border="0" src="diagram/Numer.png" height="168" width="164" usemap="#Numer.map"><map name="Numer.map">
+         <area shape="rect" coords="49,1,115,33" href="#Integer" title="Integer">
+         <area shape="rect" coords="49,45,93,77" href="#Hex" title="Hex">
+         <area shape="rect" coords="49,89,101,121" href="#Octal" title="Octal">
+         <area shape="rect" coords="49,133,99,165" href="#Float" title="Float"></map>
+      
+      <p>
+         
+         <div class="ebnf"><pre><a href="#Numer" title="Numer" shape="rect">Numer</a>    ::= <a href="#Integer" title="Integer" shape="rect">Integer</a>
+           | <a href="#Hex" title="Hex" shape="rect">Hex</a>
+           | <a href="#Octal" title="Octal" shape="rect">Octal</a>
+           | <a href="#Float" title="Float" shape="rect">Float</a></pre></div>
+         
+      </p>
+      
+      <p>no references</p><br><p style="font-size: 14px; font-weight:bold"><a name="Object">Object:</a></p>
+      <img border="0" src="diagram/Object.png" height="52" width="388" usemap="#Object.map"><map name="Object.map">
+         <area shape="rect" coords="97,17,173,49" href="#Identifier" title="Identifier">
+         <area shape="rect" coords="237,17,291,49" href="#Value" title="Value"></map>
+      
+      <p>
+         
+         <div class="ebnf"><pre><a href="#Object" title="Object" shape="rect">Object</a>   ::= '{' ( <a href="#Identifier" title="Identifier" shape="rect">Identifier</a> ':' <a href="#Value" title="Value" shape="rect">Value</a> )+ '}'</pre></div>
+         
+      </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#Value" title="Value">Value</a></li>
+            
+         </ul>
+         
+      </p><br><p style="font-size: 14px; font-weight:bold"><a name="List">List:</a></p>
+      <img border="0" src="diagram/List.png" height="52" width="244" usemap="#List.map"><map name="List.map">
+         <area shape="rect" coords="95,17,149,49" href="#Value" title="Value"></map>
+      
+      <p>
+         
+         <div class="ebnf"><pre><a href="#List" title="List" shape="rect">List</a>     ::= '[' <a href="#Value" title="Value" shape="rect">Value</a>+ ']'</pre></div>
+         
+      </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#Value" title="Value">Value</a></li>
+            
+         </ul>
+         
+      </p><br><p style="font-size: 14px; font-weight:bold"><a name="Value">Value:</a></p>
+      <img border="0" src="diagram/Value.png" height="256" width="172" usemap="#Value.map"><map name="Value.map">
+         <area shape="rect" coords="49,1,105,33" href="#String" title="String">
+         <area shape="rect" coords="49,45,117,77" href="#Number" title="Number">
+         <area shape="rect" coords="49,89,123,121" href="#Duration" title="Duration">
+         <area shape="rect" coords="49,133,119,165" href="#Variable" title="Variable">
+         <area shape="rect" coords="49,177,109,209" href="#Object" title="Object">
+         <area shape="rect" coords="49,221,91,253" href="#List" title="List"></map>
+      
+      <p>
+         
+         <div class="ebnf"><pre><a href="#Value" title="Value" shape="rect">Value</a>    ::= <a href="#String" title="String" shape="rect">String</a>
+           | <a href="#Number" title="Number" shape="rect">Number</a>
+           | <a href="#Duration" title="Duration" shape="rect">Duration</a>
+           | <a href="#Variable" title="Variable" shape="rect">Variable</a>
+           | <a href="#Object" title="Object" shape="rect">Object</a>
+           | <a href="#List" title="List" shape="rect">List</a></pre></div>
+         
+      </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#Assign" title="Assign">Assign</a></li>
+            
+            <li><a href="#Assign_Hidden" title="Assign_Hidden">Assign_Hidden</a></li>
+            
+            <li><a href="#List" title="List">List</a></li>
+            
+            <li><a href="#Object" title="Object">Object</a></li>
+            
+         </ul>
+         
+      </p><br><p style="font-size: 14px; font-weight:bold"><a name="Heredoc">Heredoc:</a></p>
+      <img border="0" src="diagram/Heredoc.png" height="96" width="806" usemap="#Heredoc.map"><map name="Heredoc.map">
+         <area shape="rect" coords="89,17,165,49" href="#Identifier" title="Identifier">
+         <area shape="rect" coords="281,17,331,49" href="#Char" title="Char"></map>
+      
+      <p>
+         
+         <div class="ebnf"><pre><a href="#Heredoc" title="Heredoc" shape="rect">Heredoc</a>  ::= '&lt;&lt;' <a href="#Identifier" title="Identifier" shape="rect">Identifier</a> '\n' ( <a href="#Char" title="Char" shape="rect">Char</a> | '\n' )+ '\n' 'Identifier (same as opening identifier)' '\n'</pre></div>
+         
+      </p>
+      
+      <p>no references</p><br><p style="font-size: 14px; font-weight:bold"><a name="Letter">Letter:</a></p>
+      <img border="0" src="diagram/Letter.png" height="36" width="260">
+      
+      <p>
+         
+         <div class="ebnf"><pre><a href="#Letter" title="Letter" shape="rect">Letter</a>   ::= 'a Unicode letter, category L'</pre></div>
+         
+      </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#PrintChar" title="PrintChar">PrintChar</a></li>
+            
+         </ul>
+         
+      </p><br><p style="font-size: 14px; font-weight:bold"><a name="Mark">Mark:</a></p>
+      <img border="0" src="diagram/Mark.png" height="36" width="262">
+      
+      <p>
+         
+         <div class="ebnf"><pre><a href="#Mark" title="Mark" shape="rect">Mark</a>     ::= 'a Unicode mark, category M'</pre></div>
+         
+      </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#PrintChar" title="PrintChar">PrintChar</a></li>
+            
+         </ul>
+         
+      </p><br><p style="font-size: 14px; font-weight:bold"><a name="Digit">Digit:</a></p>
+      <img border="0" src="diagram/Digit.png" height="36" width="118">
+      
+      <p>
+         
+         <div class="ebnf"><pre><a href="#Digit" title="Digit" shape="rect">Digit</a>    ::= [0-9]</pre></div>
+         
+      </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#Duration" title="Duration">Duration</a></li>
+            
+            <li><a href="#Float" title="Float">Float</a></li>
+            
+            <li><a href="#Hex" title="Hex">Hex</a></li>
+            
+            <li><a href="#Integer" title="Integer">Integer</a></li>
+            
+         </ul>
+         
+      </p><br><p style="font-size: 14px; font-weight:bold"><a name="Symbol">Symbol:</a></p>
+      <img border="0" src="diagram/Symbol.png" height="36" width="340">
+      
+      <p>
+         
+         <div class="ebnf"><pre><a href="#Symbol" title="Symbol" shape="rect">Symbol</a>   ::= 'a Unicode symbol character, category S'</pre></div>
+         
+      </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#PrintChar" title="PrintChar">PrintChar</a></li>
+            
+         </ul>
+         
+      </p><br><p style="font-size: 14px; font-weight:bold"><a name="Space">Space:</a></p>
+      <img border="0" src="diagram/Space.png" height="36" width="420">
+      
+      <p>
+         
+         <div class="ebnf"><pre><a href="#Space" title="Space" shape="rect">Space</a>    ::= 'a Unicode space character, category Z, excluding \n'</pre></div>
+         
+      </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#GraphicChar" title="GraphicChar">GraphicChar</a></li>
+            
+         </ul>
+         
+      </p><br><p style="font-size: 14px; font-weight:bold"><a name="Punct">Punct:</a></p>
+      <img border="0" src="diagram/Punct.png" height="36" width="674">
+      
+      <p>
+         
+         <div class="ebnf"><pre><a href="#Punct" title="Punct" shape="rect">Punct</a>    ::= 'a Unicode punctuation glyph, category P, excluding those described as terminal characters'</pre></div>
+         
+      </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#PrintChar" title="PrintChar">PrintChar</a></li>
+            
+         </ul>
+         
+      </p><br><p style="font-size: 14px; font-weight:bold"><a name="Terminal">Terminal:</a></p>
+      <img border="0" src="diagram/Terminal.png" height="388" width="134">
+      
+      <p>
+         
+         <div class="ebnf"><pre><a href="#Terminal" title="Terminal" shape="rect">Terminal</a> ::= '['
+           | ']'
+           | ';'
+           | ':'
+           | '{'
+           | '}'
+           | '\'
+           | '#'
+           | '\n'</pre></div>
+         
+      </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#Char" title="Char">Char</a></li>
+            
+         </ul>
+         
+      </p><br><p style="font-size: 14px; font-weight:bold"><a name="PrintChar">PrintChar:</a></p>
+      <img border="0" src="diagram/PrintChar.png" height="212" width="166" usemap="#PrintChar.map"><map name="PrintChar.map">
+         <area shape="rect" coords="49,1,107,33" href="#Letter" title="Letter">
+         <area shape="rect" coords="49,45,99,77" href="#Mark" title="Mark">
+         <area shape="rect" coords="49,89,117,121" href="#Number" title="Number">
+         <area shape="rect" coords="49,133,113,165" href="#Symbol" title="Symbol">
+         <area shape="rect" coords="49,177,103,209" href="#Punct" title="Punct"></map>
+      
+      <p>
+         
+         <div class="ebnf"><pre><a href="#PrintChar" title="PrintChar" shape="rect">PrintChar</a>
+         ::= <a href="#Letter" title="Letter" shape="rect">Letter</a>
+           | <a href="#Mark" title="Mark" shape="rect">Mark</a>
+           | <a href="#Number" title="Number" shape="rect">Number</a>
+           | <a href="#Symbol" title="Symbol" shape="rect">Symbol</a>
+           | <a href="#Punct" title="Punct" shape="rect">Punct</a></pre></div>
+         
+      </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#GraphicChar" title="GraphicChar">GraphicChar</a></li>
+            
+            <li><a href="#Identifier" title="Identifier">Identifier</a></li>
+            
+         </ul>
+         
+      </p><br><p style="font-size: 14px; font-weight:bold"><a name="GraphicChar">GraphicChar:</a></p>
+      <img border="0" src="diagram/GraphicChar.png" height="80" width="176" usemap="#GraphicChar.map"><map name="GraphicChar.map">
+         <area shape="rect" coords="49,1,127,33" href="#PrintChar" title="PrintChar">
+         <area shape="rect" coords="49,45,107,77" href="#Space" title="Space"></map>
+      
+      <p>
+         
+         <div class="ebnf"><pre><a href="#GraphicChar" title="GraphicChar" shape="rect">GraphicChar</a>
+         ::= <a href="#PrintChar" title="PrintChar" shape="rect">PrintChar</a>
+           | <a href="#Space" title="Space" shape="rect">Space</a></pre></div>
+         
+      </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#Bare_String" title="Bare_String">Bare_String</a></li>
+            
+            <li><a href="#Char" title="Char">Char</a></li>
+            
+         </ul>
+         
+      </p><br><p style="font-size: 14px; font-weight:bold"><a name="Char">Char:</a></p>
+      <img border="0" src="diagram/Char.png" height="80" width="194" usemap="#Char.map"><map name="Char.map">
+         <area shape="rect" coords="49,1,145,33" href="#GraphicChar" title="GraphicChar">
+         <area shape="rect" coords="49,45,121,77" href="#Terminal" title="Terminal"></map>
+      
+      <p>
+         
+         <div class="ebnf"><pre><a href="#Char" title="Char" shape="rect">Char</a>     ::= <a href="#GraphicChar" title="GraphicChar" shape="rect">GraphicChar</a>
+           | <a href="#Terminal" title="Terminal" shape="rect">Terminal</a></pre></div>
+         
+      </p>
+      
+      <p>referenced by:
+         
+         <ul>
+            
+            <li><a href="#Bare_String" title="Bare_String">Bare_String</a></li>
+            
+            <li><a href="#Heredoc" title="Heredoc">Heredoc</a></li>
+            
+            <li><a href="#Quoted_String" title="Quoted_String">Quoted_String</a></li>
+            
+         </ul>
+         
+      </p><br><hr>
+      
+      <p>
+         
+         <table border="0" class="signature">
+            
+            <tr>
+               
+               <td style="width: 100%">&nbsp;</td>
+               
+               <td valign="top">
+                  
+                  <nobr class="signature">... generated by <a name="Railroad-Diagram-Generator" class="signature" title="http://www.bottlecaps.de/rr/ui" href="http://www.bottlecaps.de/rr/ui" target="_blank">Railroad Diagram Generator</a></nobr>
+                  
+               </td>
+               
+               <td><a name="Railroad-Diagram-Generator" title="http://www.bottlecaps.de/rr/ui" href="http://www.bottlecaps.de/rr/ui" target="_blank">
+                     <img border="0" src="diagram/rr-1.39.959.png" height="16" width="16"></a></td>
+               
+            </tr>
+            
+         </table>
+         
+      </p>
+      
+   </body>
+</html>
