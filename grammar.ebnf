@@ -1,0 +1,30 @@
+Assign ::= Identifier ":" Value
+Assign_Hidden ::= Variable ":" Value
+Identifier ::= PrintChar +
+Variable ::= "@" Identifier
+Bare_String ::= (GraphicChar | ("\" Char)) +
+Quoted_String ::= '"' ([^"\] | "\" Char) * '"'
+              | "'" ([^'\] | "\" Char) * "'"
+
+Integer ::= [+-] ? Digit +
+Hex ::= [+-] ? "0" [xX] (Digit | [a-fA-F]) +
+Octal ::= [+-] ? "0" [0-7] +
+Float ::= [+-]? Digit+ ("." Digit +)? ([eE] [+-] ? Digit +)?
+Complex ::= ((Float | Integer) [+-])? (Float | Integer) "i"
+Duration ::= [+-] ? (Digit + ("." Digit +) ("ns" | "us" | "µs" | "ms" | "s" | "m" | "h")) +
+Numer ::= Integer | Hex | Octal | Float
+Object ::= "{" (Identifier ":" Value) + "}"
+List ::= "[" Value + "]"
+Value ::= String | Number | Duration | Variable | Object | List
+Heredoc ::= "<<" Identifier "\n" (Char | "\n") + "\n" "Identifier (same as opening identifier)" "\n"
+
+Letter ::= "a Unicode letter, category L"
+Mark ::= "a Unicode mark, category M"
+Digit ::= [0-9]
+Symbol ::= "a Unicode symbol character, category S"
+Space ::= "a Unicode space character, category Z, excluding \n"
+Punct ::= "a Unicode punctuation glyph, category P, excluding those described as terminal characters"
+Terminal ::= "[" | "]" | ";" | ":" | "{" | "}" | "\" | "#" | "\n"
+PrintChar ::= Letter | Mark | Number | Symbol | Punct
+GraphicChar ::= PrintChar | Space
+Char ::= GraphicChar | Terminal
