@@ -5,7 +5,7 @@ Variable ::= "@" Identifier
 Bare_String ::= (GraphicChar | ("\" Char)) +
 Quoted_String ::= '"' ([^"\] | "\" Char) * '"'
               | "'" ([^'\] | "\" Char) * "'"
-Comment ::= '#' GraphicChar +
+Comment ::= "#" GraphicChar +
 
 Integer ::= [+-] ? ([1-9] Digit + | [0])
 Hex ::= [+-] ? "0" [xX] (Digit | [a-fA-F]) +
@@ -13,10 +13,11 @@ Octal ::= [+-] ? "0" [0-7] +
 Float ::= [+-]? Digit+ ("." Digit +)? ([eE] [+-] ? Digit +)?
 Complex ::= ((Float | Integer) [+-])? (Float | Integer) "i"
 Duration ::= [+-] ? (Digit + ("." Digit +) ("ns" | "us" | "µs" | "ms" | "s" | "m" | "h")) +
+Boolean ::= "true" | "false"
 Numer ::= Integer | Hex | Octal | Float
 Object ::= "{" (Identifier ":" Value) + "}"
 List ::= "[" Value + "]"
-Value ::= String | Number | Duration | Variable | Object | List
+Value ::= String | Number | Boolean | Duration | Variable | Object | List
 Heredoc ::= "<<" Identifier "\n" (Char | "\n") + "\n" "Identifier (same as opening identifier)" "\n"
 
 Letter ::= "a Unicode letter, category L"
