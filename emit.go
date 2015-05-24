@@ -74,6 +74,8 @@ func typeEncoder(t reflect.Type) encodeFn {
 		return encodeFloat32
 	case reflect.Float64:
 		return encodeFloat64
+	case reflect.Complex128:
+		return encodeComplex128
 	case reflect.String:
 		return encodeString
 	case reflect.Struct:
@@ -221,4 +223,10 @@ func marshalerEncoder(e *encoder, v reflect.Value) {
 		panic(err)
 	}
 	e.Write(b)
+}
+
+func encodeComplex128(e *encoder, v reflect.Value) {
+	c := v.Complex()
+	r, i := real(c), imag(c)
+	fmt.Fprintf(e, "%v+%vi", r, i)
 }
