@@ -57,10 +57,36 @@ func (d *Doc) MarshalMoon() ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-// retrieve a value from the moon document and assign it to provided
-// destination.  dest must be a pointer.  path may be a path to the desired
-// field, e.g., people/1/name would get the name field of the second element of
-// the people list.
+// Get reads a value from the Moon document at a given path, assigning the
+// value to supplied destination pointer. The argument dest MUST be a pointer,
+// otherwise Get will be unable to overwrite the value that it (should) point
+// to.
+//
+// path may represent either a top-level key or a path to a value found within the document.
+//
+// Let's say you have a simple document that contains just a few values:
+//   name: jordan
+//   city: brooklyn
+// Calling Get("name", &name) would read the value in the document at the
+// "name" key and assign it to the location pointed at by the *string name.
+//
+// Let's take a more complex example:
+//   @webserver: {
+//       host: www.example.com
+//       port: 80
+//   }
+//
+//   @mailserver: {
+//       host: mail.example.com
+//       port: 25
+//   }
+//
+//   servers: [@webserver @mailserver]
+//
+// Calling Get("servers/1/host", &host) would look a list at the key "servers",
+// retrieve the item at index 1 in that list, and then read the field named
+// "host" within that item, assigning the value to the address pointed to by
+// the *string named host
 func (d *Doc) Get(path string, dest interface{}) error {
 	if d.items == nil {
 		return fmt.Errorf("no item found at path %s (doc is empty)", path)
@@ -85,9 +111,10 @@ func (d *Doc) Get(path string, dest interface{}) error {
 	return nil
 }
 
-// Fill takes the raw values from the moon document and assigns them to the
-// struct pointed at by dest.  Dest must be a struct pointer; any other type
-// for dest will result in an error.
+// Fill takes the raw values from the Moon document and assigns them to the
+// fields of the struct pointed at by dest. Dest must be a struct pointer; any
+// other type for dest will result in an error. Please see the Parse
+// documentation for a description of how the values will be filled.
 func (d *Doc) Fill(dest interface{}) error {
 	dt := reflect.TypeOf(dest)
 	if dt.Kind() != reflect.Ptr {

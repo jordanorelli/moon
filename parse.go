@@ -21,7 +21,9 @@ var nodes = map[tokenType]func(p *parser) node{
 	t_duration:         func(p *parser) node { return new(durationNode) },
 }
 
-var DefaultPath = "./config.moon"
+// Static path for configuration file. By default, a call to Parse wil look for
+// a file at the path specified by Path.
+var Path = ""
 
 func bail(status int, t string, args ...interface{}) {
 	if status == 0 {
@@ -32,7 +34,55 @@ func bail(status int, t string, args ...interface{}) {
 	os.Exit(status)
 }
 
-func Parse(dest interface{}) {
+// Parse reads in all command line arguments in addition to parsing the Moon
+// configuration file found at moon.Path. If moon.Path is not set, Parse does
+// not automatically look for a configuration file.
+//
+// The command-line options as well as the values found in the Moon document
+// will be used to fill the destination object pointed to by the dest argument.
+// Clients may use struct tags to dictate how values will be filled in the
+// destination struct. Within the struct tag, the client may provide a moon
+// document describing how the value is to be parsed.
+//
+// The following tags are currently recognized:
+//
+//   - name: the value's name inside of the moon document
+//   - help: help text to be printed when running your program as "program help"
+//   - required: whether or not the specified field is required.
+//   - default: default value for the given field
+//   - short: single character to be used as a command-line flag
+//   - long: a string of characters to be used as a command-line option
+//
+// Here's an example of a struct definition that is annotated to inform the
+// Moon parser how to fill the struct with values from a Moon document.
+//
+//   var config struct {
+//       Host string `
+//       name: host
+//       help: target host with whom we will connect
+//       required: true
+//       short: h
+//       long: host
+//       `
+//
+//       Port int `
+//       name: port
+//       help: port to dial on the target host
+//       default: 12345
+//       short: p
+//       long: port
+//       `
+//   }
+//
+// .. and here's how we would parse our command-line arguments and config file
+// at path "./config.moon" to fill the struct at config:
+//
+//   moon.Path = "./config"
+//   moon.Parse(&config)
+//
+// Any value provied as a command-line argument will override the value
+// supplied by the config file at "./config"
+func Parse(dest interface{}) *Doc {
 	cliArgs, err := parseArgs(os.Args, dest)
 	if err != nil {
 		bail(1, "unable to parse cli args: %s", err)
@@ -40,15 +90,19 @@ func Parse(dest interface{}) {
 
 	var doc *Doc
 
-	f, err := os.Open(DefaultPath)
-	if err == nil {
-		defer f.Close()
-		d, err := Read(f)
-		if err != nil {
-			bail(1, "unable to parse moon config file at path %s: %s", DefaultPath, err)
+	if Path != "" {
+		f, err := os.Open(Path)
+		if err == nil {
+			defer f.Close()
+			d, err := Read(f)
+			if err != nil {
+				bail(1, "unable to parse moon config file at path %s: %s", Path, err)
+			}
+			doc = d
 		}
-		doc = d
-	} else {
+	}
+
+	if doc == nil {
 		doc = &Doc{items: make(map[string]interface{})}
 	}
 
@@ -59,6 +113,7 @@ func Parse(dest interface{}) {
 	if err := doc.Fill(dest); err != nil {
 		bail(1, "unable to fill moon config values: %s", err)
 	}
+	return doc
 }
 
 // Reads a moon document from a given io.Reader. The io.Reader is advanced to

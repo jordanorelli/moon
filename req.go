@@ -9,7 +9,6 @@ import (
 
 type req struct {
 	name     string      // name as it appears in moon config file.  Defaults to the field name.
-	cliName  string      // name as it appears on the command line
 	help     string      // text given in help documentation
 	required bool        // whether or not the option must be configured
 	d_fault  interface{} // default value for when the option is missing
@@ -55,10 +54,9 @@ func field2req(field reflect.StructField) (*req, error) {
 	}
 
 	req := req{
-		name:    field.Name,
-		cliName: field.Name,
-		t:       field.Type,
-		long:    field.Name,
+		name: field.Name,
+		t:    field.Type,
+		long: field.Name,
 	}
 
 	// this is called by Fill, so we have to do Fill's work by hand, otherwise
@@ -66,7 +64,6 @@ func field2req(field reflect.StructField) (*req, error) {
 
 	errors := map[string]error{
 		"name":     doc.Get("name", &req.name),
-		"cli_name": doc.Get("cli_name", &req.cliName),
 		"help":     doc.Get("help", &req.help),
 		"required": doc.Get("required", &req.required),
 		"default":  doc.Get("default", &req.d_fault),

@@ -1,6 +1,7 @@
 package moon
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -54,4 +55,88 @@ func TestFill(t *testing.T) {
 		t.Errorf("unexpected port value, expected 9000, saw %d", dest.Port)
 	}
 
+}
+
+func ExampleDoc_Fill() {
+	input := `
+    name: jordan
+    age: 29
+    `
+
+	var config struct {
+		Name string `name: "name"`
+		Age  int    `name: "age"`
+		City string `name: "city" default: "Brooklyn"`
+	}
+
+	doc, err := ReadString(input)
+	if err != nil {
+		fmt.Printf("error reading input: %s", err)
+		return
+	}
+
+	if err := doc.Fill(&config); err != nil {
+		fmt.Printf("error filling config value: %s", err)
+		return
+	}
+
+	fmt.Println(config)
+	// Output: {jordan 29 Brooklyn}
+}
+
+func ExampleDoc_Get_one() {
+	input := `
+    name: jordan
+    age: 29
+    `
+
+	doc, err := ReadString(input)
+	if err != nil {
+		fmt.Printf("error reading input: %s", err)
+		return
+	}
+
+	var name string
+	if err := doc.Get("name", &name); err != nil {
+		fmt.Printf("error filling config value: %s", err)
+		return
+	}
+
+	fmt.Println(name)
+	// Output: jordan
+}
+
+func ExampleDoc_Get_two() {
+	input := `
+    @todd: {
+        name: todd
+        age: 38
+    }
+
+    @sean: {
+        name: sean
+        age: 34
+    }
+
+    @jordan: {
+        name: jordan
+        age: 29
+    }
+    brothers: [@todd @sean @jordan]
+    `
+
+	doc, err := ReadString(input)
+	if err != nil {
+		fmt.Printf("error reading input: %s", err)
+		return
+	}
+
+	var name string
+	if err := doc.Get("brothers/1/name", &name); err != nil {
+		fmt.Printf("error filling config value: %s", err)
+		return
+	}
+
+	fmt.Println(name)
+	// Output: sean
 }
