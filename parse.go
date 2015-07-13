@@ -82,45 +82,45 @@ func bail(status int, t string, args ...interface{}) {
 //
 // Any value provied as a command-line argument will override the value
 // supplied by the config file at "./config"
-func Parse(dest interface{}) *Doc {
+func Parse(dest interface{}) *Object {
 	cliArgs, err := parseArgs(os.Args, dest)
 	if err != nil {
 		bail(1, "unable to parse cli args: %s", err)
 	}
 
-	var doc *Doc
+	var obj *Object
 
 	if Path != "" {
 		f, err := os.Open(Path)
 		if err == nil {
 			defer f.Close()
-			d, err := Read(f)
+			o, err := Read(f)
 			if err != nil {
 				bail(1, "unable to parse moon config file at path %s: %s", Path, err)
 			}
-			doc = d
+			obj = o
 		}
 	}
 
-	if doc == nil {
-		doc = &Doc{items: make(map[string]interface{})}
+	if obj == nil {
+		obj = &Object{items: make(map[string]interface{})}
 	}
 
 	for k, v := range cliArgs {
-		doc.items[k] = v
+		obj.items[k] = v
 	}
 
-	if err := doc.Fill(dest); err != nil {
+	if err := obj.Fill(dest); err != nil {
 		bail(1, "unable to fill moon config values: %s", err)
 	}
-	return doc
+	return obj
 }
 
-// Reads a moon document from a given io.Reader. The io.Reader is advanced to
+// Reads a moon object from a given io.Reader. The io.Reader is advanced to
 // EOF. The reader is not closed after reading, since it's an io.Reader and not
 // an io.ReadCloser. In the event of error, the state that the source reader
 // will be left in is undefined.
-func Read(r io.Reader) (*Doc, error) {
+func Read(r io.Reader) (*Object, error) {
 	tree, err := parse(r)
 	if err != nil {
 		return nil, err
@@ -129,22 +129,22 @@ func Read(r io.Reader) (*Doc, error) {
 	if _, err := tree.eval(ctx); err != nil {
 		return nil, fmt.Errorf("eval error: %s\n", err)
 	}
-	return &Doc{items: ctx.public}, nil
+	return &Object{items: ctx.public}, nil
 }
 
-// Reads a moon document from a string. This is purely a convenience method;
+// Reads a moon object from a string. This is purely a convenience method;
 // all it does is create a buffer and call the moon.Read function.
-func ReadString(source string) (*Doc, error) {
+func ReadString(source string) (*Object, error) {
 	return Read(strings.NewReader(source))
 }
 
-// Reads a moon document from a slice of bytes. This is purely a concenience
+// Reads a moon object from a slice of bytes. This is purely a concenience
 // method; like ReadString, it simply creates a buffer and calls moon.Read
-func ReadBytes(b []byte) (*Doc, error) {
+func ReadBytes(b []byte) (*Object, error) {
 	return Read(bytes.NewBuffer(b))
 }
 
-func ReadFile(path string) (*Doc, error) {
+func ReadFile(path string) (*Object, error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, err

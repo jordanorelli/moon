@@ -29,19 +29,19 @@ import (
 	"strings"
 )
 
-// Doc is a representation of a Moon document in its native form.  It has no
+// Object is a representation of a Moon object in its native form.  It has no
 // configured options and deals only with opaque types.
-type Doc struct {
+type Object struct {
 	items map[string]interface{}
 }
 
-func (d *Doc) MarshalJSON() ([]byte, error) {
-	return json.Marshal(d.items)
+func (o *Object) MarshalJSON() ([]byte, error) {
+	return json.Marshal(o.items)
 }
 
-func (d *Doc) MarshalMoon() ([]byte, error) {
+func (o *Object) MarshalMoon() ([]byte, error) {
 	var buf bytes.Buffer
-	for k, v := range d.items {
+	for k, v := range o.items {
 		buf.WriteString(k)
 		buf.WriteByte(':')
 		buf.WriteByte(' ')
@@ -57,20 +57,23 @@ func (d *Doc) MarshalMoon() ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-// Get reads a value from the Moon document at a given path, assigning the
+// Get reads a value from the Moon object at a given path, assigning the
 // value to supplied destination pointer. The argument dest MUST be a pointer,
 // otherwise Get will be unable to overwrite the value that it (should) point
 // to.
 //
-// path may represent either a top-level key or a path to a value found within the document.
+// path may represent either a top-level key or a path to a value found within the object.
 //
 // Let's say you have a simple document that contains just a few values:
+//
 //   name: jordan
 //   city: brooklyn
+//
 // Calling Get("name", &name) would read the value in the document at the
 // "name" key and assign it to the location pointed at by the *string name.
 //
 // Let's take a more complex example:
+//
 //   @webserver: {
 //       host: www.example.com
 //       port: 80
@@ -87,15 +90,15 @@ func (d *Doc) MarshalMoon() ([]byte, error) {
 // retrieve the item at index 1 in that list, and then read the field named
 // "host" within that item, assigning the value to the address pointed to by
 // the *string named host
-func (d *Doc) Get(path string, dest interface{}) error {
-	if d.items == nil {
-		return fmt.Errorf("no item found at path %s (doc is empty)", path)
+func (o *Object) Get(path string, dest interface{}) error {
+	if o.items == nil {
+		return fmt.Errorf("no item found at path %s (object is empty)", path)
 	}
 
 	var v interface{}
 	parts := strings.Split(path, "/")
 
-	v, err := seekValue(path, parts, d.items)
+	v, err := seekValue(path, parts, o.items)
 	if err != nil {
 		return err
 	}
@@ -111,11 +114,11 @@ func (d *Doc) Get(path string, dest interface{}) error {
 	return nil
 }
 
-// Fill takes the raw values from the Moon document and assigns them to the
+// Fill takes the raw values from the Moon object and assigns them to the
 // fields of the struct pointed at by dest. Dest must be a struct pointer; any
 // other type for dest will result in an error. Please see the Parse
 // documentation for a description of how the values will be filled.
-func (d *Doc) Fill(dest interface{}) error {
+func (o *Object) Fill(dest interface{}) error {
 	// dt = destination type
 	dt := reflect.TypeOf(dest)
 	if dt.Kind() != reflect.Ptr {
@@ -132,7 +135,7 @@ func (d *Doc) Fill(dest interface{}) error {
 	for fname, req := range reqs {
 		// fv = field value
 		fv := dv.FieldByName(fname)
-		v, ok := d.items[req.name]
+		v, ok := o.items[req.name]
 		if ok {
 			if !fv.Type().AssignableTo(reflect.TypeOf(v)) {
 				return fmt.Errorf("unable to assign field %s: source type %v is not assignable to destination type %v", req.name, fv.Type(), reflect.TypeOf(v))
