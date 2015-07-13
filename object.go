@@ -98,7 +98,7 @@ func (o *Object) Get(path string, dest interface{}) error {
 	var v interface{}
 	parts := strings.Split(path, "/")
 
-	v, err := seekValue(path, parts, o.items)
+	v, err := seekValue(path, parts, o)
 	if err != nil {
 		return err
 	}
@@ -186,12 +186,12 @@ func seekValue(fullpath string, parts []string, root interface{}) (interface{}, 
 		return seekValue(fullpath, tail, v)
 	}
 
-	m, ok := root.(map[string]interface{})
+	m, ok := root.(*Object)
 	if !ok {
-		return nil, fmt.Errorf("can only key a map[string]interface{}, root is %v", reflect.TypeOf(root))
+		return nil, fmt.Errorf("can only key an Object, root is %v", reflect.TypeOf(root))
 	}
 
-	v, ok := m[head]
+	v, ok := m.items[head]
 	if !ok {
 		return nil, NoValue{fullpath, head}
 	}

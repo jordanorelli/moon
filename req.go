@@ -101,7 +101,7 @@ func requirements(dest interface{}) (map[string]req, error) {
 		field := dv.Type().Field(i)
 		req, err := field2req(field)
 		if err != nil {
-			return nil, fmt.Errorf("unable to gather requireents for field %s: %s", field.Name, err)
+			return nil, fmt.Errorf("unable to gather requirements for field %s: %s", field.Name, err)
 		}
 		out[field.Name] = *req
 	}

@@ -21,23 +21,23 @@ func TestArgs(t *testing.T) {
 		return
 	}
 
-	if vals["host"] != "example.com" {
-		t.Errorf("expected host 'example.com', saw host '%s'", vals["host"])
+	if vals.items["host"] != "example.com" {
+		t.Errorf("expected host 'example.com', saw host '%s'", vals.items["host"])
 	}
 
-	if vals["port"] != 9000 {
-		t.Errorf("expected port 9000, saw port %d", vals["port"])
+	if vals.items["port"] != 9000 {
+		t.Errorf("expected port 9000, saw port %d", vals.items["port"])
 	}
 
-	if vals["user"] != "fart" {
-		t.Errorf("expected user 'fart', saw user '%s'", vals["user"])
+	if vals.items["user"] != "fart" {
+		t.Errorf("expected user 'fart', saw user '%s'", vals.items["user"])
 	}
 
-	if vals["zip"] != true {
+	if vals.items["zip"] != true {
 		t.Errorf("expected zip to be true, is false")
 	}
 
-	if vals["verbose"] != true {
+	if vals.items["verbose"] != true {
 		t.Errorf("expected verbose to be true, is false")
 	}
 }

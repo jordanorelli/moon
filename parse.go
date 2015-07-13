@@ -106,7 +106,7 @@ func Parse(dest interface{}) *Object {
 		obj = &Object{items: make(map[string]interface{})}
 	}
 
-	for k, v := range cliArgs {
+	for k, v := range cliArgs.items {
 		obj.items[k] = v
 	}
 

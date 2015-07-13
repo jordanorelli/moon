@@ -7,13 +7,13 @@ import (
 	"strings"
 )
 
-func parseArgs(args []string, dest interface{}) (map[string]interface{}, error) {
+func parseArgs(args []string, dest interface{}) (*Object, error) {
 	reqs, err := requirements(dest)
 	if err != nil {
 		return nil, fmt.Errorf("unable to parse args: bad requirements: %s", err)
 	}
 
-	out := make(map[string]interface{})
+	out := Object{items: make(map[string]interface{})}
 	shorts := make(map[string]req, len(reqs))
 	longs := make(map[string]req, len(reqs))
 	for _, req := range reqs {
@@ -57,7 +57,7 @@ func parseArgs(args []string, dest interface{}) (map[string]interface{}, error) 
 				return nil, fmt.Errorf("unrecognized long opt: %s", key)
 			}
 			if req.t.Kind() == reflect.Bool {
-				out[req.name] = true
+				out.items[req.name] = true
 				continue
 			}
 
@@ -66,7 +66,7 @@ func parseArgs(args []string, dest interface{}) (map[string]interface{}, error) 
 			if err != nil {
 				return nil, fmt.Errorf("unable to parse cli argument %s: %s", key, err)
 			}
-			out[req.name] = d.items[key]
+			out.items[req.name] = d.items[key]
 		} else if strings.HasPrefix(arg, "-") {
 			arg = strings.TrimPrefix(arg, "-")
 			if strings.ContainsRune(arg, '=') {
@@ -86,7 +86,7 @@ func parseArgs(args []string, dest interface{}) (map[string]interface{}, error) 
 				if err != nil {
 					return nil, fmt.Errorf("unable to parse cli argument %c: %s", runes[0], err)
 				}
-				out[req.name] = d.items["key"]
+				out.items[req.name] = d.items["key"]
 			} else {
 				runes := []rune(arg)
 				for j := 0; j < len(runes); j++ {
@@ -96,7 +96,7 @@ func parseArgs(args []string, dest interface{}) (map[string]interface{}, error) 
 						return nil, fmt.Errorf("unrecognized short opt: %c", r)
 					}
 					if req.t.Kind() == reflect.Bool {
-						out[req.name] = true
+						out.items[req.name] = true
 						continue
 					}
 					if j != len(runes)-1 {
@@ -114,14 +114,14 @@ func parseArgs(args []string, dest interface{}) (map[string]interface{}, error) 
 					if err != nil {
 						return nil, fmt.Errorf("error parsing cli arg %s: %s", req.name, err)
 					}
-					out[req.name] = d.items["key"]
+					out.items[req.name] = d.items["key"]
 				}
 			}
 		} else {
 			break
 		}
 	}
-	return out, nil
+	return &out, nil
 }
 
 func showHelp(dest interface{}) {

@@ -452,15 +452,15 @@ func (o *objectNode) pretty(w io.Writer, prefix string) error {
 }
 
 func (o *objectNode) eval(ctx *context) (interface{}, error) {
-	out := make(map[string]interface{}, len(*o))
+	out := Object{items: make(map[string]interface{}, len(*o))}
 	for name, node := range *o {
 		v, err := node.eval(ctx)
 		if err != nil {
 			return nil, err
 		}
-		out[name] = v
+		out.items[name] = v
 	}
-	return out, nil
+	return &out, nil
 }
 
 type variableNode struct {
