@@ -116,6 +116,7 @@ func (d *Doc) Get(path string, dest interface{}) error {
 // other type for dest will result in an error. Please see the Parse
 // documentation for a description of how the values will be filled.
 func (d *Doc) Fill(dest interface{}) error {
+	// dt = destination type
 	dt := reflect.TypeOf(dest)
 	if dt.Kind() != reflect.Ptr {
 		return fmt.Errorf("destination is of type %v; a pointer type is required", dt)
@@ -126,11 +127,16 @@ func (d *Doc) Fill(dest interface{}) error {
 		return fmt.Errorf("unable to gather requirements: %s", err)
 	}
 
+	// dv = destination value
 	dv := reflect.ValueOf(dest).Elem()
 	for fname, req := range reqs {
+		// fv = field value
 		fv := dv.FieldByName(fname)
 		v, ok := d.items[req.name]
 		if ok {
+			if !fv.Type().AssignableTo(reflect.TypeOf(v)) {
+				return fmt.Errorf("unable to assign field %s: source type %v is not assignable to destination type %v", req.name, fv.Type(), reflect.TypeOf(v))
+			}
 			fv.Set(reflect.ValueOf(v))
 		} else {
 			if req.required {

@@ -34,13 +34,13 @@ root:
       dur_6
     value:
       dur:
-        18us
+        18µs
   assign:
     name:
       dur_7
     value:
       dur:
-        45us
+        45µs
   assign:
     name:
       dur_8
