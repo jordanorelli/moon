@@ -179,9 +179,13 @@ func (o *Object) fillValue(dv reflect.Value) error {
 
 		switch t_ov := ov.(type) {
 		case *Object:
-			return t_ov.fillValue(fv)
+			if err := t_ov.fillValue(fv); err != nil {
+				return err
+			}
 		case List:
-			return t_ov.fillValue(fv)
+			if err := t_ov.fillValue(fv); err != nil {
+				return err
+			}
 		default:
 			if !fv.Type().AssignableTo(reflect.TypeOf(ov)) {
 				return fmt.Errorf("unable to assign field %s: source type %v is not assignable to destination type %v", req.name, reflect.TypeOf(ov), fv.Type())

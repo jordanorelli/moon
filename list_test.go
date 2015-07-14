@@ -1,6 +1,7 @@
 package moon
 
 import (
+	"reflect"
 	"testing"
 )
 
@@ -11,39 +12,32 @@ func TestFillList(t *testing.T) {
         {hostname: dev.example.com; label: dev}
         {hostname: prod.example.com; label: prod}
     ]
+    numbers: [1 1 2 3 5 8 13]
     `)
 	if err != nil {
 		t.Error(err)
 		return
 	}
+	type server struct {
+		Hostname string `name: hostname; required: true`
+		Label    string `name: label; required: true`
+	}
 	var config struct {
-		Servers []struct {
-			Hostname string `name: hostname; required: true`
-			Label    string `name: label; required: true`
-		} `name: servers`
+		Servers []server `name: servers`
+		Numbers []int    `name: numbers`
 	}
 	if err := doc.Fill(&config); err != nil {
 		t.Error(err)
 		return
 	}
-	if config.Servers == nil {
-		t.Error("servers is nil for some reason")
-		return
+	servers := []server{
+		{"dev.example.com", "dev"},
+		{"prod.example.com", "prod"},
 	}
-	if len(config.Servers) != 2 {
-		t.Errorf("expected 2 servers, saw %d", len(config.Servers))
-		return
+	if !reflect.DeepEqual(config.Servers, servers) {
+		t.Errorf("bad servers: %v", config.Servers)
 	}
-	if config.Servers[0].Hostname != "dev.example.com" {
-		t.Errorf("wut lol %v", config.Servers[0])
-	}
-	if config.Servers[0].Label != "dev" {
-		t.Errorf("wut lol %v", config.Servers[0])
-	}
-	if config.Servers[1].Hostname != "prod.example.com" {
-		t.Errorf("wut 1 lol %v", config.Servers[1])
-	}
-	if config.Servers[1].Label != "prod" {
-		t.Errorf("wut 2 lol %v", config.Servers[1])
+	if !reflect.DeepEqual(config.Numbers, []int{1, 1, 2, 3, 5, 8, 13}) {
+		t.Errorf("bad numbers: %v", config.Numbers)
 	}
 }
