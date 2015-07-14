@@ -87,18 +87,22 @@ func field2req(field reflect.StructField) (*req, error) {
 	return &req, nil
 }
 
-func requirements(dest interface{}) (map[string]req, error) {
-	dt := reflect.TypeOf(dest)
-	if dt.Kind() != reflect.Ptr {
-		return nil, fmt.Errorf("destination is of type %v; a pointer type is required", dt)
+// requirements gathers the moon requirements for a given struct type. the
+// output is a mapping of field names to requirements.
+func requirements(t reflect.Type) (map[string]req, error) {
+	switch t.Kind() {
+	case reflect.Ptr:
+		t = t.Elem()
+	case reflect.Struct:
+	default:
+		return nil, fmt.Errorf("destination is of type %v; a pointer or struct type is required", t)
 	}
 
-	dv := reflect.ValueOf(dest).Elem()
-	n := dv.NumField()
-	out := make(map[string]req, dv.NumField())
+	n := t.NumField()
+	out := make(map[string]req, t.NumField())
 
 	for i := 0; i < n; i++ {
-		field := dv.Type().Field(i)
+		field := t.Field(i)
 		req, err := field2req(field)
 		if err != nil {
 			return nil, fmt.Errorf("unable to gather requirements for field %s: %s", field.Name, err)

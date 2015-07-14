@@ -141,23 +141,32 @@ func ExampleDoc_Get_two() {
 	// Output: sean
 }
 
-// func TestFillEmbeds(t *testing.T) {
-// 	in := `top: {val: some_data}`
-//
-// 	var dest struct {
-// 		Top *struct {
-// 			Val string `name: val`
-// 		} `name: top`
-// 	}
-//
-// 	doc, err := ReadString(in)
-// 	if err != nil {
-// 		t.Error(err)
-// 		return
-// 	}
-//
-// 	if err := doc.Fill(&dest); err != nil {
-// 		t.Error(err)
-// 		return
-// 	}
-// }
+func TestFillEmbeds(t *testing.T) {
+	in := `top: {val: some_data}`
+
+	var dest struct {
+		Top *struct {
+			Val string `name: val`
+		} `name: top`
+	}
+
+	doc, err := ReadString(in)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	if err := doc.Fill(&dest); err != nil {
+		t.Error(err)
+		return
+	}
+
+	if dest.Top == nil {
+		t.Error("didn't actually set a value")
+		return
+	}
+
+	if dest.Top.Val != "some_data" {
+		t.Errorf("expected some_data, got %v", dest.Top.Val)
+	}
+}

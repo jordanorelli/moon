@@ -122,32 +122,69 @@ func (o *Object) Fill(dest interface{}) error {
 	// dt = destination type
 	dt := reflect.TypeOf(dest)
 	if dt.Kind() != reflect.Ptr {
-		return fmt.Errorf("destination is of type %v; a pointer type is required", dt)
+		return fmt.Errorf("destination is of type %v (%v); a pointer type is required", dt, dt.Kind())
 	}
 
-	reqs, err := requirements(dest)
+	// ensure the pointer points to a struct type
+	if dt.Elem().Kind() != reflect.Struct {
+		return fmt.Errorf("destination is a pointer to a non-struct type: %v (pointer to struct required)", dt.Elem())
+	}
+
+	// value of our struct pointer
+	pv := reflect.ValueOf(dest)
+
+	// value of the struct being pointed to
+	v := pv.Elem()
+
+	return o.fillValue(v)
+}
+
+func (o *Object) fillValue(dv reflect.Value) error {
+	switch dv.Kind() {
+	case reflect.Struct:
+		// this is fine
+	case reflect.Ptr:
+		if dv.IsNil() {
+			dv.Set(reflect.New(dv.Type().Elem()))
+		}
+		dv = reflect.Indirect(dv)
+	default:
+		return fmt.Errorf("moon object can only fillValue to a struct value, saw %v (%v)", dv.Type(), dv.Kind())
+	}
+
+	// the destination defines the requirements (i.e., the method of unpacking
+	// our moon data)
+	reqs, err := requirements(dv.Type())
 	if err != nil {
-		return fmt.Errorf("unable to gather requirements: %s", err)
+		return fmt.Errorf("unable to gather requirements: %v", err)
 	}
 
-	// dv = destination value
-	dv := reflect.ValueOf(dest).Elem()
 	for fname, req := range reqs {
-		// fv = field value
+		// field value
 		fv := dv.FieldByName(fname)
-		v, ok := o.items[req.name]
-		if ok {
-			if !fv.Type().AssignableTo(reflect.TypeOf(v)) {
-				return fmt.Errorf("unable to assign field %s: source type %v is not assignable to destination type %v", req.name, fv.Type(), reflect.TypeOf(v))
-			}
-			fv.Set(reflect.ValueOf(v))
-		} else {
+		// object value
+		ov, ok := o.items[req.name]
+		if !ok {
+			// moon data is missing expected field
 			if req.required {
+				// if the field is required, that's an error
 				return fmt.Errorf("required field missing: %s", fname)
 			}
 			if req.d_fault != nil {
+				// otherwise, we look for a user-defined default value
 				fv.Set(reflect.ValueOf(req.d_fault))
 			}
+			continue
+		}
+
+		switch t_ov := ov.(type) {
+		case *Object:
+			return t_ov.fillValue(fv)
+		default:
+			if !fv.Type().AssignableTo(reflect.TypeOf(ov)) {
+				return fmt.Errorf("unable to assign field %s: source type %v is not assignable to destination type %v", req.name, reflect.TypeOf(ov), fv.Type())
+			}
+			fv.Set(reflect.ValueOf(ov))
 		}
 	}
 	return nil

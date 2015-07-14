@@ -8,7 +8,7 @@ import (
 )
 
 func parseArgs(args []string, dest interface{}) (*Object, error) {
-	reqs, err := requirements(dest)
+	reqs, err := requirements(reflect.TypeOf(dest))
 	if err != nil {
 		return nil, fmt.Errorf("unable to parse args: bad requirements: %s", err)
 	}
@@ -125,7 +125,7 @@ func parseArgs(args []string, dest interface{}) (*Object, error) {
 }
 
 func showHelp(dest interface{}) {
-	reqs, err := requirements(dest)
+	reqs, err := requirements(reflect.TypeOf(dest))
 	if err != nil {
 		panic(err)
 	}
