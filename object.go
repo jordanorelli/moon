@@ -147,7 +147,7 @@ func (o *Object) fillValue(dv reflect.Value) error {
 		if dv.IsNil() {
 			dv.Set(reflect.New(dv.Type().Elem()))
 		}
-		dv = reflect.Indirect(dv)
+		dv = dv.Elem()
 	default:
 		return fmt.Errorf("moon object can only fillValue to a struct value, saw %v (%v)", dv.Type(), dv.Kind())
 	}
@@ -180,6 +180,8 @@ func (o *Object) fillValue(dv reflect.Value) error {
 		switch t_ov := ov.(type) {
 		case *Object:
 			return t_ov.fillValue(fv)
+		case List:
+			return t_ov.fillValue(fv)
 		default:
 			if !fv.Type().AssignableTo(reflect.TypeOf(ov)) {
 				return fmt.Errorf("unable to assign field %s: source type %v is not assignable to destination type %v", req.name, reflect.TypeOf(ov), fv.Type())
@@ -209,9 +211,9 @@ func seekValue(fullpath string, parts []string, root interface{}) (interface{}, 
 	head, tail := parts[0], parts[1:]
 	n, err := strconv.Atoi(head)
 	if err == nil {
-		l, ok := root.([]interface{})
+		l, ok := root.(List)
 		if !ok {
-			return nil, fmt.Errorf("can only index a []interface{}, root is %s", reflect.TypeOf(root))
+			return nil, fmt.Errorf("can only index a List, root is %s", reflect.TypeOf(root))
 		}
 		if n >= len(l) {
 			return nil, fmt.Errorf("path %s is out of bounds, can't get the %d index from a slice of len %d", fullpath, n, len(l))

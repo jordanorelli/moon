@@ -388,7 +388,7 @@ func (l *listNode) pretty(w io.Writer, prefix string) error {
 }
 
 func (l *listNode) eval(ctx *context) (interface{}, error) {
-	out := make([]interface{}, 0, len(*l))
+	out := make(List, 0, len(*l))
 	for _, n := range *l {
 		v, err := n.eval(ctx)
 		if err != nil {
