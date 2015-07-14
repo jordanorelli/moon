@@ -8,11 +8,13 @@ import (
 func TestFillList(t *testing.T) {
 	doc, err := ReadString(`
     # yay for lists
+    @cool_names: [larry; curly; moe]
     servers: [
         {hostname: dev.example.com; label: dev}
         {hostname: prod.example.com; label: prod}
     ]
     numbers: [1 1 2 3 5 8 13]
+    names: @cool_names
     `)
 	if err != nil {
 		t.Error(err)
@@ -25,6 +27,7 @@ func TestFillList(t *testing.T) {
 	var config struct {
 		Servers []server `name: servers`
 		Numbers []int    `name: numbers`
+		Names   []string `name: names`
 	}
 	if err := doc.Fill(&config); err != nil {
 		t.Error(err)
@@ -39,5 +42,8 @@ func TestFillList(t *testing.T) {
 	}
 	if !reflect.DeepEqual(config.Numbers, []int{1, 1, 2, 3, 5, 8, 13}) {
 		t.Errorf("bad numbers: %v", config.Numbers)
+	}
+	if !reflect.DeepEqual(config.Names, []string{"larry", "curly", "moe"}) {
+		t.Errorf("bad names: %v", config.Names)
 	}
 }
