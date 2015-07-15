@@ -28,7 +28,7 @@ func (l List) fillValue(v reflect.Value) error {
 			}
 		default:
 			sv := reflect.ValueOf(item)
-			if !dv.Type().AssignableTo(sv.Type()) {
+			if !sv.Type().AssignableTo(dv.Type()) {
 				return fmt.Errorf("unable to assign element %d: source type %v is not assignable to destination type %v", idx, sv.Type(), dv.Type())
 			}
 			dv.Set(sv)

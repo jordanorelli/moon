@@ -15,6 +15,7 @@ func TestFillList(t *testing.T) {
     ]
     numbers: [1 1 2 3 5 8 13]
     names: @cool_names
+    misc: [one; 2.1 {x: 5.0 y: 1.0}]
     `)
 	if err != nil {
 		t.Error(err)
@@ -25,9 +26,10 @@ func TestFillList(t *testing.T) {
 		Label    string `name: label; required: true`
 	}
 	var config struct {
-		Servers []server `name: servers`
-		Numbers []int    `name: numbers`
-		Names   []string `name: names`
+		Servers []server      `name: servers`
+		Numbers []int         `name: numbers`
+		Names   []string      `name: names`
+		Misc    []interface{} `name: misc`
 	}
 	if err := doc.Fill(&config); err != nil {
 		t.Error(err)
@@ -45,5 +47,9 @@ func TestFillList(t *testing.T) {
 	}
 	if !reflect.DeepEqual(config.Names, []string{"larry", "curly", "moe"}) {
 		t.Errorf("bad names: %v", config.Names)
+	}
+	misc := []interface{}{"one", 2.1, map[string]interface{}{"x": 5.0, "y": 1.0}}
+	if !reflect.DeepEqual(config.Misc, misc) {
+		t.Errorf("bad misc: %v", config.Misc)
 	}
 }

@@ -149,6 +149,10 @@ func (o *Object) fillValue(dv reflect.Value) error {
 		}
 		dv = dv.Elem()
 	default:
+		if reflect.TypeOf(o.items).AssignableTo(dv.Type()) {
+			dv.Set(reflect.ValueOf(o.items))
+			return nil
+		}
 		return fmt.Errorf("moon object can only fillValue to a struct value, saw %v (%v)", dv.Type(), dv.Kind())
 	}
 
