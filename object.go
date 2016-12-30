@@ -110,7 +110,12 @@ func (o *Object) Get(path string, dest interface{}) error {
 
 	dv := reflect.ValueOf(dest)
 	dve := dv.Elem()
-	dve.Set(reflect.ValueOf(v))
+
+	if reflect.TypeOf(v).Kind() == reflect.Ptr {
+		dve.Set(reflect.ValueOf(v).Elem())
+	} else {
+		dve.Set(reflect.ValueOf(v))
+	}
 	return nil
 }
 
